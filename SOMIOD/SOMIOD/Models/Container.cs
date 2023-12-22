@@ -9,8 +9,8 @@ namespace SOMIOD.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public DateTime Creation_Date { get; set; }
-        public int Parent_Id { get; set; }
+        public DateTime Creation_Dt { get; set; }
+        public int Parent { get; set; }
 
     }
 }
