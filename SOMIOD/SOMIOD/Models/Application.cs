@@ -18,7 +18,7 @@ namespace SOMIOD.Models
 
       //  [XmlElement("Creation_Dt")]
        // public DateTime Creation_Dt { get; set; }
-        public string Creation_Dt { get; set; }
+        public string Creation_dt { get; set; }
         
     }
 }
