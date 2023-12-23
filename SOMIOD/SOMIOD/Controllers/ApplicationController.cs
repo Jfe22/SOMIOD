@@ -59,13 +59,12 @@ namespace SOMIOD.Controllers
             SqlDataReader sqlDataReader = cmd.ExecuteReader();
             if (sqlDataReader.Read())
             {
-                Application application = new Application()
+                returnApp = new Application()
                 {
                     Id = (int)sqlDataReader["Id"],
                     Name = (string)sqlDataReader["Name"],
                     Creation_dt = (string)sqlDataReader["Creation_dt"]
                 };
-                returnApp = application;
             }
             sqlDataReader.Close();
             sqlConnection.Close();
