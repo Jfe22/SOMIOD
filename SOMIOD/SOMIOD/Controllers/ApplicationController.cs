@@ -12,32 +12,21 @@ namespace SOMIOD.Controllers
     public class ApplicationController : ApiController
     {
 
-        /*
-        //------------- JUST FOR TESTING -- TODO: USE DB ------------- 
-        List<Application> applications = new List<Application>
-        {
-            new Application {Id = 1, Name = "FirstApp", Creation_dt = DateTime.Now.ToString("yyyy-M-dd H:m:ss")},
-            new Application {Id = 2, Name = "SecondApp", Creation_dt = DateTime.Now.ToString("yyyy-M-dd H:m:ss")},
-        };
-        //------------------------------------------------------------
-        */
-
         //---------------- SETTING UP THE DB --------------------
-        List<Application> applications = new List<Application>();
         string connectionString = SOMIOD.Properties.Settings.Default.ConnStr;
         //-------------------------------------------------------
 
 
-        //TODO: Change POST, PUT, DELETE methods to use DB
+        //TODO: Use try-catch to catch user errors while requesting 
 
         [Route("api/applications")]
         public IEnumerable<Application> Get()
         {
+            List<Application> applications = new List<Application>();
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             sqlConnection.Open();
 
             SqlCommand cmd = new SqlCommand("SELECT * FROM Applications", sqlConnection);
-
             SqlDataReader sqlDataReader = cmd.ExecuteReader();
             while (sqlDataReader.Read())
             {
@@ -60,7 +49,6 @@ namespace SOMIOD.Controllers
         public IHttpActionResult Get(string name)
         {
             Application returnApp = null;
-
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             sqlConnection.Open();
 
@@ -68,7 +56,6 @@ namespace SOMIOD.Controllers
             cmd.Parameters.AddWithValue("name", name);
             cmd.CommandType = System.Data.CommandType.Text;
             cmd.Connection = sqlConnection;
-
             SqlDataReader sqlDataReader = cmd.ExecuteReader();
             if (sqlDataReader.Read())
             {
@@ -83,60 +70,60 @@ namespace SOMIOD.Controllers
             sqlDataReader.Close();
             sqlConnection.Close();
 
-            if (returnApp == null)
-            {
-                return NotFound();
-            }
+            if (returnApp == null) return NotFound();
             return Ok(returnApp);
         }
+
 
         [Route("api/applications")]
         public IHttpActionResult Post([FromBody]Application app)
         {
-            int initial_size = applications.Count();
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            sqlConnection.Open();
 
-            Application newApp = new Application();
-            newApp.Id = app.Id;
-            newApp.Name = app.Name;
-            newApp.Creation_dt = DateTime.Now.ToString("yyyy-M-dd H:m:ss");
+            SqlCommand cmd = new SqlCommand("INSERT INTO Applications VALUES (@name, @creation_dt)", sqlConnection);
+            cmd.Parameters.AddWithValue("name", app.Name);
+            cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+            int nrows = cmd.ExecuteNonQuery();
+            sqlConnection.Close();
 
-            applications.Add(newApp);
-
-            if (applications.Count == initial_size)
-            {
-                return BadRequest();
-            } 
-            return Ok(applications);
+            if (nrows <= 0) return BadRequest(); 
+            return Ok(nrows);
         }
+
 
         [Route("api/applications/{name}")]
         public IHttpActionResult Put(String name, [FromBody]Application app)
         {
-            Application application = applications.FirstOrDefault(p => p.Name == name);
-            Application originalApp = application;
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            sqlConnection.Open();
 
-            application = app;
+            SqlCommand cmd = new SqlCommand("UPDATE Applications SET name=@nameNew WHERE name=@nameOld", sqlConnection);
+            cmd.Parameters.AddWithValue("nameNew", app.Name);
+            cmd.Parameters.AddWithValue("nameOld", name);
+            //should time also change when updated???
+            //cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+            int nrows = cmd.ExecuteNonQuery();
+            sqlConnection.Close();
 
-            if (application == originalApp)
-            {
-                return BadRequest();
-            }
-            return Ok(applications);
+            if (nrows <= 0) return BadRequest();
+            return Ok(nrows);
         }
+
 
         [Route("api/applications/{name}")]
         public IHttpActionResult Delete(String name)
         {
-            int initial_size = applications.Count();
-            Application app_to_delete = applications.FirstOrDefault(p => p.Name == name); 
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            sqlConnection.Open();
 
-            applications.Remove(app_to_delete);
+            SqlCommand cmd = new SqlCommand("DELETE FROM Applications WHERE name=@name", sqlConnection);
+            cmd.Parameters.AddWithValue("name", name);
+            int nrows = cmd.ExecuteNonQuery();
+            sqlConnection.Close();
 
-            if (applications.Count() == initial_size)
-            {
-                return BadRequest();
-            }
-            return Ok(applications);
+            if (nrows <= 0) return BadRequest();
+            return Ok(nrows);
         }
     }
 }
