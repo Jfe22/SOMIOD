@@ -88,18 +88,62 @@ namespace SOMIOD.Controllers
         }
 
         // POST: api/Container
-        public void Post([FromBody]string value)
+        [Route("api/applications/{appName}/containers")]
+        public IHttpActionResult Post(string appName, [FromBody]Container container)
         {
+            int parentID = fetchParentId(appName);
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            sqlConnection.Open();
+
+            SqlCommand cmd = new SqlCommand("INSERT INTO Containers VALUES (@name, @creation_dt, @parent)", sqlConnection);
+            cmd.Parameters.AddWithValue("name", container.Name);
+            cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+            cmd.Parameters.AddWithValue("parent", parentID);
+            //cmd.Parameters.AddWithValue("name", container.Parent);
+            //does the container even need to be passed on the request? appName is already in query so its duplicate on request
+            int nrows = cmd.ExecuteNonQuery();
+            sqlConnection.Close();
+
+            if (nrows <= 0) return BadRequest();
+            return Ok(nrows);
         }
 
         // PUT: api/Container/5
-        public void Put(int id, [FromBody]string value)
+        [Route("api/applications/{appName}/containers/{contName}")]
+        public IHttpActionResult Put(string appName, string contName, [FromBody]Container container)
         {
+            int parentID = fetchParentId(appName);
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            sqlConnection.Open();
+
+            SqlCommand cmd = new SqlCommand("UPDATE Containers SET name = @name, parent = @parent WHERE name = @nameOld", sqlConnection);
+            cmd.Parameters.AddWithValue("name", container.Name);
+            //cmd.Parameters.AddWithValue("parent", parentID);
+            //here we might want to change the parent so routeParent =! requestParent and this makes sense 
+            cmd.Parameters.AddWithValue("parent", container.Parent);
+            cmd.Parameters.AddWithValue("nameOld", contName);
+            int nrows = cmd.ExecuteNonQuery();
+            sqlConnection.Close();
+
+            if (nrows <= 0) return BadRequest();
+            return Ok(nrows);
+
+
         }
 
-        // DELETE: api/Container/5
-        public void Delete(int id)
+        [Route("api/applications/{appName}/containers/{contName}")]
+        public IHttpActionResult Delete(string contName)
         {
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            sqlConnection.Open();
+
+            SqlCommand cmd = new SqlCommand("DELETE FROM Containers WHERE name=@contName", sqlConnection);
+            cmd.Parameters.AddWithValue("contName", contName);
+            int nrows = cmd.ExecuteNonQuery();
+            sqlConnection.Close();
+
+            if (nrows <= 0) return BadRequest();
+            return Ok(nrows);
         }
     }
 }
