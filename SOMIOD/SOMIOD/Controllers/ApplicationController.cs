@@ -19,7 +19,9 @@ namespace SOMIOD.Controllers
 
         //TODO: Use try-catch to catch user errors while requesting 
 
-        [Route("api/applications")]
+        //[Route("api/applications")]
+        [Route("api/somiod/applications")]
+
         public IEnumerable<Application> Get()
         {
             List<Application> applications = new List<Application>();
@@ -45,7 +47,7 @@ namespace SOMIOD.Controllers
         }
 
 
-        [Route("api/applications/{name}")]
+        [Route("api/somiod/{name}")]
         public IHttpActionResult Get(string name)
         {
             Application returnApp = null;
@@ -74,7 +76,7 @@ namespace SOMIOD.Controllers
         }
 
 
-        [Route("api/applications")]
+        [Route("api/somiod/applications")]
         public IHttpActionResult Post([FromBody]Application app)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
@@ -91,7 +93,7 @@ namespace SOMIOD.Controllers
         }
 
 
-        [Route("api/applications/{name}")]
+        [Route("api/somiod/{name}")]
         public IHttpActionResult Put(String name, [FromBody]Application app)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
@@ -110,7 +112,7 @@ namespace SOMIOD.Controllers
         }
 
 
-        [Route("api/applications/{name}")]
+        [Route("api/somiod/{name}")]
         public IHttpActionResult Delete(String name)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);

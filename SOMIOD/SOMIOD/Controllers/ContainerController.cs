@@ -30,7 +30,7 @@ namespace SOMIOD.Controllers
         //-------------------------------------------------------
 
 
-        [Route("api/applications/{appName}/containers")]
+        [Route("api/somiod/{appName}/containers")]
         public IEnumerable<Container> Get(string appName)
         {
             int parentID = fetchParentId(appName);
@@ -58,7 +58,7 @@ namespace SOMIOD.Controllers
             return containers;
         }
 
-        [Route("api/applications/{appName}/containers/{contName}")]
+        [Route("api/somiod/{appName}/{contName}")]
         public IHttpActionResult Get(string appName, string contName)
         {
             int parentID = fetchParentId(appName);
@@ -88,7 +88,7 @@ namespace SOMIOD.Controllers
         }
 
         // POST: api/Container
-        [Route("api/applications/{appName}/containers")]
+        [Route("api/somiod/{appName}/containers")]
         public IHttpActionResult Post(string appName, [FromBody]Container container)
         {
             int parentID = fetchParentId(appName);
@@ -109,7 +109,7 @@ namespace SOMIOD.Controllers
         }
 
         // PUT: api/Container/5
-        [Route("api/applications/{appName}/containers/{contName}")]
+        [Route("api/somiod/{appName}/{contName}")]
         public IHttpActionResult Put(string appName, string contName, [FromBody]Container container)
         {
             int parentID = fetchParentId(appName);
@@ -131,7 +131,7 @@ namespace SOMIOD.Controllers
 
         }
 
-        [Route("api/applications/{appName}/containers/{contName}")]
+        [Route("api/somiod/{appName}/{contName}")]
         public IHttpActionResult Delete(string contName)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
