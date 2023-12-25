@@ -107,7 +107,7 @@ namespace SOMIOD.Controllers
                 int nrows = cmd.ExecuteNonQuery();
                 sqlConnection.Close();
 
-                if (nrows <= 0) return BadRequest();
+                if (nrows <= 0) return BadRequest("Could not create application resource");
                 return Ok(nrows);
             }
             catch (Exception ex)
@@ -134,7 +134,7 @@ namespace SOMIOD.Controllers
                 int nrows = cmd.ExecuteNonQuery();
                 sqlConnection.Close();
 
-                if (nrows <= 0) return BadRequest();
+                if (nrows <= 0) return NotFound();
                 return Ok(nrows);
             }
             catch (Exception ex)
@@ -158,7 +158,7 @@ namespace SOMIOD.Controllers
                 int nrows = cmd.ExecuteNonQuery();
                 sqlConnection.Close();
 
-                if (nrows <= 0) return BadRequest();
+                if (nrows <= 0) return NotFound();
                 return Ok(nrows);
             }
             catch (Exception ex)

@@ -48,6 +48,7 @@ namespace SOMIOD.Controllers
         public IEnumerable<Data> Get(string contName)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
+            SqlDataReader sqlDataReader = null;
             List<Data> dataList = new List<Data>();
             try
             {
@@ -56,7 +57,7 @@ namespace SOMIOD.Controllers
 
                 SqlCommand cmd = new SqlCommand("SELECT * FROM Data WHERE Parent = @parentID", sqlConnection);
                 cmd.Parameters.AddWithValue("parentID", parentID);
-                SqlDataReader sqlDataReader = cmd.ExecuteReader();
+                sqlDataReader = cmd.ExecuteReader();
                 while (sqlDataReader.Read())
                 {
                     Data data = new Data()
@@ -73,6 +74,7 @@ namespace SOMIOD.Controllers
             }
             catch (Exception ex)
             {
+                if (!sqlDataReader.IsClosed) sqlDataReader.Close();
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
             }
 
@@ -84,16 +86,17 @@ namespace SOMIOD.Controllers
         public IHttpActionResult Get(string contName, string dataId)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
+            SqlDataReader sqlDataReader = null;
             try
             {
-                int parentID = FetchParentId(contName);
                 Data returnData = null;
+                int parentID = FetchParentId(contName);
                 sqlConnection.Open();
 
                 SqlCommand cmd = new SqlCommand("SELECT * FROM Data WHERE Parent = @parentID AND Id = @dataId", sqlConnection);
                 cmd.Parameters.AddWithValue("parentID", parentID);
                 cmd.Parameters.AddWithValue("dataId", dataId);
-                SqlDataReader sqlDataReader = cmd.ExecuteReader();
+                sqlDataReader = cmd.ExecuteReader();
                 if (sqlDataReader.Read())
                 {
                     returnData = new Data()
@@ -107,11 +110,12 @@ namespace SOMIOD.Controllers
                 sqlDataReader.Close();
                 sqlConnection.Close();
 
-                if (returnData == null) return BadRequest();
+                if (returnData == null) return NotFound();
                 return Ok(returnData);
             } 
             catch (Exception ex) 
             {
+                if (!sqlDataReader.IsClosed) sqlDataReader.Close();
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
                 return BadRequest(ex.Message);
             }
@@ -120,19 +124,85 @@ namespace SOMIOD.Controllers
 
 
 
-        // POST: api/Data
-        public void Post([FromBody] string value)
+        [Route("api/somiod/{appName}/{contName}/data")]
+        public IHttpActionResult Post(string contName, [FromBody] Data data)
         {
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            try
+            {
+                int parentID = FetchParentId(contName);
+                sqlConnection.Open();
+
+                SqlCommand cmd = new SqlCommand("INSERT INTO Data VALUES (@content, @creation_dt, @parent)", sqlConnection);
+                cmd.Parameters.AddWithValue("content", data.Content);
+                cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+                cmd.Parameters.AddWithValue("parent", parentID);
+                //cmd.Parameters.AddWithValue("name", container.Parent);
+                //does the container even need to be passed on the request? appName is already in query so its duplicate on request
+                int nrows = cmd.ExecuteNonQuery();
+                sqlConnection.Close();
+
+                if (nrows <= 0) return BadRequest("Could not create data resource");
+                return Ok(nrows);
+            }
+            catch (Exception ex)
+            {
+                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                return BadRequest(ex.Message);
+            }
         }
 
-        // PUT: api/Data/5
-        public void Put(int id, [FromBody] string value)
+        [Route("api/somiod/{appName}/{contName}/data/{dataId}")]
+        public IHttpActionResult Put(string contName, int dataId, [FromBody] Data data)
         {
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            try
+            {
+                int parentID = FetchParentId(contName);
+                sqlConnection.Open();
+
+                SqlCommand cmd = new SqlCommand("UPDATE Data SET content = @content, parent = @parent WHERE id = @dataId", sqlConnection);
+                cmd.Parameters.AddWithValue("content", data.Content);
+                //cmd.Parameters.AddWithValue("parent", parentID);
+                //here we might want to change the parent so routeParent =! requestParent and this makes sense 
+                cmd.Parameters.AddWithValue("parent", data.Parent);
+                cmd.Parameters.AddWithValue("dataId", dataId);
+                int nrows = cmd.ExecuteNonQuery();
+                sqlConnection.Close();
+
+                if (nrows <= 0) return NotFound();
+                return Ok(nrows);
+            }
+            catch (Exception ex)
+            {
+                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                return BadRequest(ex.Message);
+            }
+
         }
 
         // DELETE: api/Data/5
-        public void Delete(int id)
+        [Route("api/somiod/{appName}/{contName}/data/{dataId}")]
+        public IHttpActionResult Delete(int dataId)
         {
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            try
+            {
+                sqlConnection.Open();
+
+                SqlCommand cmd = new SqlCommand("DELETE FROM Data WHERE id=@dataId", sqlConnection);
+                cmd.Parameters.AddWithValue("dataId", dataId);
+                int nrows = cmd.ExecuteNonQuery();
+                sqlConnection.Close();
+
+                if (nrows <= 0) return NotFound();
+                return Ok(nrows);
+            }
+            catch (Exception ex)
+            {
+                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                return BadRequest(ex.Message);
+            }
         }
 
     }
