@@ -17,62 +17,79 @@ namespace SOMIOD.Controllers
         //-------------------------------------------------------
 
 
-        //TODO: Use try-catch to catch user errors while requesting 
 
-        //[Route("api/applications")]
         [Route("api/somiod/applications")]
 
         public IEnumerable<Application> Get()
         {
-            List<Application> applications = new List<Application>();
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            sqlConnection.Open();
-
-            SqlCommand cmd = new SqlCommand("SELECT * FROM Applications", sqlConnection);
-            SqlDataReader sqlDataReader = cmd.ExecuteReader();
-            while (sqlDataReader.Read())
+            SqlDataReader sqlDataReader = null; 
+            List<Application> applications = new List<Application>();
+            try
             {
-                Application application = new Application()
+                sqlConnection.Open();
+
+                SqlCommand cmd = new SqlCommand("SELECT * FROM Applications", sqlConnection);
+                sqlDataReader = cmd.ExecuteReader();
+                while (sqlDataReader.Read())
                 {
-                    Id = (int)sqlDataReader["Id"],
-                    Name = (string)sqlDataReader["Name"],
-                    Creation_dt = (string)sqlDataReader["Creation_dt"]
-                };
-                applications.Add(application);
+                    Application application = new Application()
+                    {
+                        Id = (int)sqlDataReader["Id"],
+                        Name = (string)sqlDataReader["Name"],
+                        Creation_dt = (string)sqlDataReader["Creation_dt"]
+                    };
+                    applications.Add(application);
+                }
+                sqlDataReader.Close();
+                sqlConnection.Close();
             }
-            sqlDataReader.Close();
-            sqlConnection.Close();
+            catch (Exception ex)
+            {
+                if (!sqlDataReader.IsClosed) sqlDataReader.Close();
+                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+            }
 
             return applications;
         }
 
 
-        [Route("api/somiod/{name}")]
-        public IHttpActionResult Get(string name)
+        [Route("api/somiod/{appName}")]
+        public IHttpActionResult Get(string appName)
         {
-            Application returnApp = null;
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            sqlConnection.Open();
-
-            SqlCommand cmd = new SqlCommand("SELECT * FROM Applications WHERE Name=@name");
-            cmd.Parameters.AddWithValue("name", name);
-            cmd.CommandType = System.Data.CommandType.Text;
-            cmd.Connection = sqlConnection;
-            SqlDataReader sqlDataReader = cmd.ExecuteReader();
-            if (sqlDataReader.Read())
+            SqlDataReader sqlDataReader = null; 
+            Application returnApp = null;
+            try
             {
-                returnApp = new Application()
-                {
-                    Id = (int)sqlDataReader["Id"],
-                    Name = (string)sqlDataReader["Name"],
-                    Creation_dt = (string)sqlDataReader["Creation_dt"]
-                };
-            }
-            sqlDataReader.Close();
-            sqlConnection.Close();
+                sqlConnection.Open();
 
-            if (returnApp == null) return NotFound();
-            return Ok(returnApp);
+                SqlCommand cmd = new SqlCommand("SELECT * FROM Applications WHERE Name=@appName");
+                cmd.Parameters.AddWithValue("appName", appName);
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.Connection = sqlConnection;
+                sqlDataReader = cmd.ExecuteReader();
+                if (sqlDataReader.Read())
+                {
+                    returnApp = new Application()
+                    {
+                        Id = (int)sqlDataReader["Id"],
+                        Name = (string)sqlDataReader["Name"],
+                        Creation_dt = (string)sqlDataReader["Creation_dt"]
+                    };
+                }
+                sqlDataReader.Close();
+                sqlConnection.Close();
+
+                if (returnApp == null) return NotFound();
+                return Ok(returnApp);
+            }
+            catch (Exception ex)
+            {
+                if (!sqlDataReader.IsClosed) sqlDataReader.Close();
+                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                return BadRequest(ex.Message);
+            }
         }
 
 
@@ -80,51 +97,75 @@ namespace SOMIOD.Controllers
         public IHttpActionResult Post([FromBody]Application app)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            sqlConnection.Open();
+            try
+            {
+                sqlConnection.Open();
 
-            SqlCommand cmd = new SqlCommand("INSERT INTO Applications VALUES (@name, @creation_dt)", sqlConnection);
-            cmd.Parameters.AddWithValue("name", app.Name);
-            cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
-            int nrows = cmd.ExecuteNonQuery();
-            sqlConnection.Close();
+                SqlCommand cmd = new SqlCommand("INSERT INTO Applications VALUES (@name, @creation_dt)", sqlConnection);
+                cmd.Parameters.AddWithValue("name", app.Name);
+                cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+                int nrows = cmd.ExecuteNonQuery();
+                sqlConnection.Close();
 
-            if (nrows <= 0) return BadRequest(); 
-            return Ok(nrows);
+                if (nrows <= 0) return BadRequest();
+                return Ok(nrows);
+            }
+            catch (Exception ex)
+            {
+                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                return BadRequest(ex.Message);
+            }
         }
 
 
-        [Route("api/somiod/{name}")]
-        public IHttpActionResult Put(String name, [FromBody]Application app)
+        [Route("api/somiod/{appName}")]
+        public IHttpActionResult Put(String appName, [FromBody]Application app)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            sqlConnection.Open();
+            try
+            {
+                sqlConnection.Open();
 
-            SqlCommand cmd = new SqlCommand("UPDATE Applications SET name=@nameNew WHERE name=@nameOld", sqlConnection);
-            cmd.Parameters.AddWithValue("nameNew", app.Name);
-            cmd.Parameters.AddWithValue("nameOld", name);
-            //should time also change when updated???
-            //cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
-            int nrows = cmd.ExecuteNonQuery();
-            sqlConnection.Close();
+                SqlCommand cmd = new SqlCommand("UPDATE Applications SET name=@nameNew WHERE name=@nameOld", sqlConnection);
+                cmd.Parameters.AddWithValue("nameNew", app.Name);
+                cmd.Parameters.AddWithValue("nameOld", appName);
+                //should time also change when updated???
+                //cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+                int nrows = cmd.ExecuteNonQuery();
+                sqlConnection.Close();
 
-            if (nrows <= 0) return BadRequest();
-            return Ok(nrows);
+                if (nrows <= 0) return BadRequest();
+                return Ok(nrows);
+            }
+            catch (Exception ex)
+            {
+                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                return BadRequest(ex.Message);
+            }
         }
 
 
-        [Route("api/somiod/{name}")]
-        public IHttpActionResult Delete(String name)
+        [Route("api/somiod/{appName}")]
+        public IHttpActionResult Delete(String appName)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            sqlConnection.Open();
+            try
+            {
+                sqlConnection.Open();
 
-            SqlCommand cmd = new SqlCommand("DELETE FROM Applications WHERE name=@name", sqlConnection);
-            cmd.Parameters.AddWithValue("name", name);
-            int nrows = cmd.ExecuteNonQuery();
-            sqlConnection.Close();
+                SqlCommand cmd = new SqlCommand("DELETE FROM Applications WHERE name=@appName", sqlConnection);
+                cmd.Parameters.AddWithValue("appName", appName);
+                int nrows = cmd.ExecuteNonQuery();
+                sqlConnection.Close();
 
-            if (nrows <= 0) return BadRequest();
-            return Ok(nrows);
+                if (nrows <= 0) return BadRequest();
+                return Ok(nrows);
+            }
+            catch (Exception ex)
+            {
+                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
