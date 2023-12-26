@@ -170,6 +170,11 @@ namespace SOMIOD.Controllers
                 int nrows = cmd.ExecuteNonQuery();
                 sqlConnection.Close();
 
+
+                //publish mensage here??
+                //MttqClient teste = new MttqClient("IPAddress.Parse("...
+                //----------------------
+
                 if (nrows <= 0) return NotFound();
                 return Ok(nrows);
             }
