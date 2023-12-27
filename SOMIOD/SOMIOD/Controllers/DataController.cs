@@ -165,7 +165,8 @@ namespace SOMIOD.Controllers
                 cmd.Parameters.AddWithValue("content", data.Content);
                 //cmd.Parameters.AddWithValue("parent", parentID);
                 //here we might want to change the parent so routeParent =! requestParent and this makes sense 
-                cmd.Parameters.AddWithValue("parent", data.Parent);
+                //cmd.Parameters.AddWithValue("parent", data.Parent);
+                cmd.Parameters.AddWithValue("parent", parentID);
                 cmd.Parameters.AddWithValue("dataId", dataId);
                 int nrows = cmd.ExecuteNonQuery();
                 sqlConnection.Close();

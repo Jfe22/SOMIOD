@@ -67,7 +67,7 @@ namespace Lighting
                 RestResponse responseCreateSub = restClient.Execute(requestCreateCont);
             }
 
-            RestRequest requestData = new RestRequest("lighting/light_bulb/data/1", Method.Get);
+            RestRequest requestData = new RestRequest("lighting/light_bulb/data/8", Method.Get);
             requestData.RequestFormat = DataFormat.Xml;
             //var responseData = restClient.Execute<Data>(requestData).Data;
             Data responseData = restClient.Execute<Data>(requestData).Data;
