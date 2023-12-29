@@ -14,13 +14,41 @@ namespace SOMIOD.Controllers
 
         //---------------- SETTING UP THE DB --------------------
         string connectionString = SOMIOD.Properties.Settings.Default.ConnStr;
+
+        public int FetchParentId(string appName)
+        {
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            SqlDataReader sqlDataReader = null;
+            int parentID = -1;
+            try
+            {
+                sqlConnection.Open();
+
+                SqlCommand cmd = new SqlCommand("SELECT * FROM Applications WHERE Name=@appName", sqlConnection);
+                cmd.Parameters.AddWithValue("appName", appName);
+                cmd.CommandType = System.Data.CommandType.Text;
+                sqlDataReader = cmd.ExecuteReader();
+
+                if (sqlDataReader.Read()) parentID = (int)sqlDataReader["Id"];
+
+                sqlDataReader.Close();
+                sqlConnection.Close();
+            }
+            catch (Exception ex)
+            {
+                if (!sqlDataReader.IsClosed) sqlDataReader.Close();
+                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+            }
+
+            return parentID;
+        }
         //-------------------------------------------------------
 
 
 
         [Route("api/somiod/applications")]
 
-        public IEnumerable<Application> DiscoverApp()
+        public IEnumerable<Application> GetDiscoverApplications()
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null; 
@@ -53,6 +81,42 @@ namespace SOMIOD.Controllers
             return applications;
         }
 
+        public IHttpActionResult DiscoverContainers(string appName)
+        {
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            SqlDataReader sqlDataReader = null;
+            List<Container> containers = new List<Container>();
+            try
+            {
+                int parentID = FetchParentId(appName);
+                sqlConnection.Open();
+
+                SqlCommand cmd = new SqlCommand("SELECT * FROM Containers WHERE Parent = @parentID", sqlConnection);
+                cmd.Parameters.AddWithValue("parentID", parentID);
+                sqlDataReader = cmd.ExecuteReader();
+                while (sqlDataReader.Read())
+                {
+                    Container container = new Container()
+                    {
+                        Id = (int)sqlDataReader["Id"],
+                        Name = (string)sqlDataReader["Name"],
+                        Creation_dt = (string)sqlDataReader["Creation_dt"],
+                        Parent = (int)sqlDataReader["Parent"],
+                    };
+                    containers.Add(container);
+                }
+                sqlDataReader.Close();
+                sqlConnection.Close();
+            }
+            catch
+            {
+                if (!sqlDataReader.IsClosed) sqlDataReader.Close();
+                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+            }
+
+            return Ok(containers);
+        }
+
 
         [Route("api/somiod/{appName}")]
         public IHttpActionResult Get(string appName)
@@ -61,8 +125,7 @@ namespace SOMIOD.Controllers
             if (Request.Headers.Contains("somiod-discover"))
             {
                 somiod_header = Request.Headers.GetValues("somiod-discover").FirstOrDefault();
-                ContainerController contController = new ContainerController();
-                return contController.GetAll(appName);
+                return DiscoverContainers(appName); 
             }
 
             SqlConnection sqlConnection = new SqlConnection(connectionString);
