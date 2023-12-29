@@ -20,7 +20,7 @@ namespace SOMIOD.Controllers
 
         [Route("api/somiod/applications")]
 
-        public IEnumerable<Application> Get()
+        public IEnumerable<Application> DiscoverApp()
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null; 
@@ -57,6 +57,14 @@ namespace SOMIOD.Controllers
         [Route("api/somiod/{appName}")]
         public IHttpActionResult Get(string appName)
         {
+            string somiod_header = null;
+            if (Request.Headers.Contains("somiod-discover"))
+            {
+                somiod_header = Request.Headers.GetValues("somiod-discover").FirstOrDefault();
+                ContainerController contController = new ContainerController();
+                return contController.GetAll(appName);
+            }
+
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null; 
             Application returnApp = null;

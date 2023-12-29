@@ -44,7 +44,7 @@ namespace SOMIOD.Controllers
 
 
         [Route("api/somiod/{appName}/containers")]
-        public IEnumerable<Container> Get(string appName)
+        public IHttpActionResult GetAll(string appName)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null;
@@ -77,7 +77,7 @@ namespace SOMIOD.Controllers
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
             }
 
-            return containers;
+            return Ok(containers) ;
         }
 
         [Route("api/somiod/{appName}/{contName}")]
