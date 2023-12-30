@@ -12,7 +12,7 @@ namespace SOMIOD.Controllers
     public class DataController : ApiController
     {
 
-        //---------------- SET UP --------------------
+        //---------------- AUX -----------------
         string connectionString = SOMIOD.Properties.Settings.Default.ConnStr;
         public int FetchParentId(string contName)
         {
@@ -41,46 +41,10 @@ namespace SOMIOD.Controllers
 
             return parentID;
         }
-        //--------------------------------------------
+        //---------------- --- -----------------
 
 
-        [Route("api/somiod/{appName}/{contName}/data")]
-        public IEnumerable<Data> Get(string contName)
-        {
-            SqlConnection sqlConnection = new SqlConnection(connectionString);
-            SqlDataReader sqlDataReader = null;
-            List<Data> dataList = new List<Data>();
-            try
-            {
-                int parentID = FetchParentId(contName);
-                sqlConnection.Open();
-
-                SqlCommand cmd = new SqlCommand("SELECT * FROM Data WHERE Parent = @parentID", sqlConnection);
-                cmd.Parameters.AddWithValue("parentID", parentID);
-                sqlDataReader = cmd.ExecuteReader();
-                while (sqlDataReader.Read())
-                {
-                    Data data = new Data()
-                    {
-                        Id = (int)sqlDataReader["Id"],
-                        Content = (string)sqlDataReader["Content"],
-                        Creation_dt = (string)sqlDataReader["Creation_dt"],
-                        Parent = (int)sqlDataReader["Parent"],
-                    };
-                    dataList.Add(data);
-                }
-                sqlDataReader.Close();
-                sqlConnection.Close();
-            }
-            catch (Exception ex)
-            {
-                if (!sqlDataReader.IsClosed) sqlDataReader.Close();
-                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
-            }
-
-            return dataList;
-        }
-
+        //---------------- HTTP -----------------
         //considering data has no name field, which attribute should we use in route? ---> curr using ID
         [Route("api/somiod/{appName}/{contName}/data/{dataId}")]
         public IHttpActionResult Get(string contName, string dataId)
@@ -137,8 +101,6 @@ namespace SOMIOD.Controllers
                 cmd.Parameters.AddWithValue("content", data.Content);
                 cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
                 cmd.Parameters.AddWithValue("parent", parentID);
-                //cmd.Parameters.AddWithValue("name", container.Parent);
-                //does the container even need to be passed on the request? appName is already in query so its duplicate on request
                 int nrows = cmd.ExecuteNonQuery();
                 sqlConnection.Close();
 
@@ -163,10 +125,9 @@ namespace SOMIOD.Controllers
 
                 SqlCommand cmd = new SqlCommand("UPDATE Data SET content = @content, parent = @parent WHERE id = @dataId", sqlConnection);
                 cmd.Parameters.AddWithValue("content", data.Content);
-                //cmd.Parameters.AddWithValue("parent", parentID);
-                //here we might want to change the parent so routeParent =! requestParent and this makes sense 
-                //cmd.Parameters.AddWithValue("parent", data.Parent);
                 cmd.Parameters.AddWithValue("parent", parentID);
+                //here we might want to change the parent so routeParent != requestParent and this makes sense 
+                //cmd.Parameters.AddWithValue("parent", data.Parent);
                 cmd.Parameters.AddWithValue("dataId", dataId);
                 int nrows = cmd.ExecuteNonQuery();
                 sqlConnection.Close();
@@ -187,7 +148,6 @@ namespace SOMIOD.Controllers
 
         }
 
-        // DELETE: api/Data/5
         [Route("api/somiod/{appName}/{contName}/data/{dataId}")]
         public IHttpActionResult Delete(int dataId)
         {
@@ -210,6 +170,7 @@ namespace SOMIOD.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        //---------------- ---- -----------------
 
     }
 }

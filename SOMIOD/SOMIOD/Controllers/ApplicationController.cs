@@ -34,8 +34,9 @@ namespace SOMIOD.Controllers
                 sqlDataReader.Close();
                 sqlConnection.Close();
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
                 if (!sqlDataReader.IsClosed) sqlDataReader.Close();
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
             }
@@ -71,6 +72,7 @@ namespace SOMIOD.Controllers
             {
                 if (!sqlDataReader.IsClosed) sqlDataReader.Close();
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                return BadRequest(ex.Message);
             }
 
             return Ok(applications);
@@ -103,10 +105,11 @@ namespace SOMIOD.Controllers
                 sqlDataReader.Close();
                 sqlConnection.Close();
             }
-            catch
+            catch (Exception ex)
             {
                 if (!sqlDataReader.IsClosed) sqlDataReader.Close();
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                return BadRequest(ex.Message);
             }
 
             return Ok(containers);
@@ -128,7 +131,7 @@ namespace SOMIOD.Controllers
             }
 
             return BadRequest("URL only available with somiod-discover header. " +
-                "Did you mean to use 'somiod-discover: application'?");
+                "Did you mean to use the header 'somiod-discover: application'?");
         }
         
 
