@@ -104,6 +104,10 @@ namespace SOMIOD.Controllers
                 int nrows = cmd.ExecuteNonQuery();
                 sqlConnection.Close();
 
+                //publish mensage here??
+                //MttqClient teste = new MttqClient("IPAddress.Parse("...
+                //----------------------
+
                 if (nrows <= 0) return BadRequest("Could not create data resource");
                 return Ok(nrows);
             }
@@ -114,9 +118,14 @@ namespace SOMIOD.Controllers
             }
         }
 
+
         [Route("api/somiod/{appName}/{contName}/data/{dataId}")]
         public IHttpActionResult Put(string contName, int dataId, [FromBody] Data data)
         {
+            return BadRequest("UPDATE OPERATION NOT ALLOWED FOR DATA AND SUBSCRIPTIONS");
+
+            /* ----------- UNCOMMENT TO ENABLE UPDATE OPERATIONS FOR DATA ------------ 
+
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             try
             {
@@ -126,16 +135,9 @@ namespace SOMIOD.Controllers
                 SqlCommand cmd = new SqlCommand("UPDATE Data SET content = @content, parent = @parent WHERE id = @dataId", sqlConnection);
                 cmd.Parameters.AddWithValue("content", data.Content);
                 cmd.Parameters.AddWithValue("parent", parentID);
-                //here we might want to change the parent so routeParent != requestParent and this makes sense 
-                //cmd.Parameters.AddWithValue("parent", data.Parent);
                 cmd.Parameters.AddWithValue("dataId", dataId);
                 int nrows = cmd.ExecuteNonQuery();
                 sqlConnection.Close();
-
-
-                //publish mensage here??
-                //MttqClient teste = new MttqClient("IPAddress.Parse("...
-                //----------------------
 
                 if (nrows <= 0) return NotFound();
                 return Ok(nrows);
@@ -145,7 +147,7 @@ namespace SOMIOD.Controllers
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
                 return BadRequest(ex.Message);
             }
-
+            ------- UPDATE OPERATION NOT ALLOWED FOR DATA AND SUBSCRIPTIONS ------- */  
         }
 
         [Route("api/somiod/{appName}/{contName}/data/{dataId}")]
@@ -171,6 +173,5 @@ namespace SOMIOD.Controllers
             }
         }
         //---------------- ---- -----------------
-
     }
 }

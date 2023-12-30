@@ -116,6 +116,10 @@ namespace SOMIOD.Controllers
         [Route("api/somiod/{appName}/{contName}/sub/{subName}")]
         public IHttpActionResult Put(string contName, string subName, [FromBody]Subscription subscription)
         {
+            return BadRequest("UPDATE OPERATION NOT ALLOWED FOR DATA AND SUBSCRIPTIONS");
+
+            /* ------- UNCOMMENT TO ENABLE UPDATE OPERATIONS FOR SUBSCRIPTIONS ------- 
+
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             try
             {
@@ -141,6 +145,7 @@ namespace SOMIOD.Controllers
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
                 return BadRequest(ex.Message);
             }
+            ------- UPDATE OPERATION NOT ALLOWED FOR DATA AND SUBSCRIPTIONS ------- */ 
         }
 
         [Route("api/somiod/{appName}/{contName}/sub/{subName}")]

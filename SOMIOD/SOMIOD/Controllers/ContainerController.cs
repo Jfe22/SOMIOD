@@ -175,7 +175,8 @@ namespace SOMIOD.Controllers
             }
         }
 
-        [Route("api/somiod/{appName}")]
+        // TODO: need to be just [Route("api/somiod/{appName}")] but we get conflicts with the appcontroller 
+        [Route("api/somiod/{appName}/containers")]
         public IHttpActionResult Post(string appName, [FromBody]Container container)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
