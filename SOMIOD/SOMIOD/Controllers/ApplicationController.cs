@@ -125,9 +125,9 @@ namespace SOMIOD.Controllers
             {
                 if ("application" == Request.Headers.GetValues("somiod-discover").FirstOrDefault())
                     return DiscoverApplications(); 
-                else 
-                    return BadRequest("Invalid somiod-discover header value. " +
-                        "Did you mean 'application'?");
+
+                return BadRequest("Invalid somiod-discover header value. " +
+                    "Did you mean 'application'?");
             }
 
             return BadRequest("URL only available with somiod-discover header. " +
@@ -183,7 +183,7 @@ namespace SOMIOD.Controllers
         }
 
 
-        [Route("api/somiod/applications")]
+        [Route("api/somiod")]
         public IHttpActionResult Post([FromBody]Application app)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);

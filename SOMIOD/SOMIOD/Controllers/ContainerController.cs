@@ -175,7 +175,7 @@ namespace SOMIOD.Controllers
             }
         }
 
-        [Route("api/somiod/{appName}/containers")]
+        [Route("api/somiod/{appName}")]
         public IHttpActionResult Post(string appName, [FromBody]Container container)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
