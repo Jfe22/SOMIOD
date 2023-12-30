@@ -12,7 +12,7 @@ namespace SOMIOD.Controllers
     public class ApplicationController : ApiController
     {
 
-        //---------------- SETTING UP THE DB --------------------
+        //---------------- AUX -----------------
         string connectionString = SOMIOD.Properties.Settings.Default.ConnStr;
 
         public int FetchParentId(string appName)
@@ -42,13 +42,8 @@ namespace SOMIOD.Controllers
 
             return parentID;
         }
-        //-------------------------------------------------------
 
-
-
-        [Route("api/somiod/applications")]
-
-        public IEnumerable<Application> GetDiscoverApplications()
+        public IHttpActionResult DiscoverApplications()
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null; 
@@ -78,7 +73,7 @@ namespace SOMIOD.Controllers
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
             }
 
-            return applications;
+            return Ok(applications);
         }
 
         public IHttpActionResult DiscoverContainers(string appName)
@@ -116,16 +111,37 @@ namespace SOMIOD.Controllers
 
             return Ok(containers);
         }
+        //---------------- --- -----------------
 
+
+        //---------------- HTTP -----------------
+        [Route("api/somiod")]
+        public IHttpActionResult Get()
+        {
+            if (Request.Headers.Contains("somiod-discover"))
+            {
+                if ("application" == Request.Headers.GetValues("somiod-discover").FirstOrDefault())
+                    return DiscoverApplications(); 
+                else 
+                    return BadRequest("Invalid somiod-discover header value. " +
+                        "Did you mean 'application'?");
+            }
+
+            return BadRequest("URL only available with somiod-discover header. " +
+                "Did you mean to use 'somiod-discover: application'?");
+        }
+        
 
         [Route("api/somiod/{appName}")]
         public IHttpActionResult Get(string appName)
         {
-            string somiod_header = null;
             if (Request.Headers.Contains("somiod-discover"))
             {
-                somiod_header = Request.Headers.GetValues("somiod-discover").FirstOrDefault();
-                return DiscoverContainers(appName); 
+                if ("container" == Request.Headers.GetValues("somiod-discover").FirstOrDefault())
+                    return DiscoverContainers(appName); 
+                else 
+                    return BadRequest("Invalid somiod-discover header value. " +
+                        "Did you mean 'container'?");
             }
 
             SqlConnection sqlConnection = new SqlConnection(connectionString);
@@ -238,5 +254,6 @@ namespace SOMIOD.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        //---------------- ---- -----------------
     }
 }
