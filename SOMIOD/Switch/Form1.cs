@@ -42,59 +42,24 @@ namespace Switch
         //dataId is hardcoded, will the app suport more then one light???
         private void buttonLightOn_Click(object sender, EventArgs e)
         {
-            RestRequest request = new RestRequest("ligthing/light_bulb/data/8", Method.Get);
-            RestResponse response = restClient.Execute(request);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            SOMIOD.Models.Data data = new SOMIOD.Models.Data
             {
-                SOMIOD.Models.Data data = new SOMIOD.Models.Data
-                {
-                    Content = "ON"
-                };
-                RestRequest requestCreateData = new RestRequest("ligthing/light_bulb/data", Method.Post);
-                requestCreateData.AddObject(data);
-                RestResponse responseCreateData = restClient.Execute(requestCreateData);
-            }
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                SOMIOD.Models.Data data = new SOMIOD.Models.Data
-                {
-                    Content = "ON"
-                };
-                RestRequest requestUpdateData = new RestRequest("ligthing/light_bulb/data/8", Method.Put);
-                requestUpdateData.AddObject(data);
-                RestResponse responseUpdateData = restClient.Execute(requestUpdateData);
-            }
-
+                Content = "ON"
+            };
+            RestRequest requestCreateData = new RestRequest("ligthing/light_bulb/data", Method.Post);
+            requestCreateData.AddObject(data);
+            RestResponse responseCreateData = restClient.Execute(requestCreateData);
         }
 
         private void buttonLightOff_Click(object sender, EventArgs e)
         {
-            RestRequest request = new RestRequest("ligthing/light_bulb/data/8", Method.Get);
-            RestResponse response = restClient.Execute(request);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            SOMIOD.Models.Data data = new SOMIOD.Models.Data
             {
-                SOMIOD.Models.Data data = new SOMIOD.Models.Data
-                {
-                    Content = "OFF"
-                };
-                RestRequest requestCreateData = new RestRequest("ligthing/light_bulb/data", Method.Post);
-                requestCreateData.AddObject(data);
-                RestResponse responseCreateData = restClient.Execute(requestCreateData);
-            }
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                SOMIOD.Models.Data data = new SOMIOD.Models.Data
-                {
-                    Content = "OFF"
-                };
-                RestRequest requestUpdateData = new RestRequest("ligthing/light_bulb/data/8", Method.Put);
-                requestUpdateData.AddObject(data);
-                RestResponse responseUpdateData = restClient.Execute(requestUpdateData);
-            }
+                Content = "OFF"
+            };
+            RestRequest requestCreateData = new RestRequest("ligthing/light_bulb/data", Method.Post);
+            requestCreateData.AddObject(data);
+            RestResponse responseCreateData = restClient.Execute(requestCreateData);
         }
     }
 }

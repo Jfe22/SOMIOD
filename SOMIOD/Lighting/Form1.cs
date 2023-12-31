@@ -86,13 +86,22 @@ namespace Lighting
                 RestResponse responseCreateSub = restClient.Execute(requestCreateCont);
             }
 
+            /* ------- if we using put ------------------
             RestRequest requestData = new RestRequest("lighting/light_bulb/data/8", Method.Get);
             requestData.RequestFormat = DataFormat.Xml;
             //var responseData = restClient.Execute<Data>(requestData).Data;
             Data responseData = restClient.Execute<Data>(requestData).Data;
             if (responseData == null) textBoxLightValue.Text = "No data yet";
             else textBoxLightValue.Text = responseData.Content;
-
+            ------- if we using put ------------------ */ 
+            RestRequest requestData = new RestRequest("lighting/light_bulb", Method.Get);
+            requestData.RequestFormat = DataFormat.Xml;
+            requestData.AddHeader("somiod-discover", "data");
+            //var responseData = restClient.Execute<Data>(requestData).Data;
+            List<Data> responseData = restClient.Execute<List<Data>>(requestData).Data;
+            if (responseData == null) textBoxLightValue.Text = "No data yet";
+            else textBoxLightValue.Text = responseData[responseData.Count - 1].Content;
+            
             //turn the websocket on here as a listener???
 
         }
