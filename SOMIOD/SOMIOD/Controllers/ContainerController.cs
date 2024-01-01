@@ -180,25 +180,32 @@ namespace SOMIOD.Controllers
         public IHttpActionResult Post(string appName, [FromBody]Container container)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            try
-            {
-                int parentID = FetchParentId(appName, "Applications");
-                sqlConnection.Open();
 
-                SqlCommand cmd = new SqlCommand("INSERT INTO Containers VALUES (@name, @creation_dt, @parent)", sqlConnection);
-                cmd.Parameters.AddWithValue("name", container.Name);
-                cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
-                cmd.Parameters.AddWithValue("parent", parentID);
-                int nrows = cmd.ExecuteNonQuery();
-                sqlConnection.Close();
-
-                if (nrows <= 0) return BadRequest("Could not create container resource");
-                return Ok(nrows);
-            }
-            catch (Exception ex)
+            int tries = 0;
+            string uniqueNameGen = "";
+            while (true)
             {
-                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
-                return BadRequest(ex.Message);
+                try
+                {
+                    int parentID = FetchParentId(appName, "Applications");
+                    sqlConnection.Open();
+
+                    SqlCommand cmd = new SqlCommand("INSERT INTO Containers VALUES (@name, @creation_dt, @parent)", sqlConnection);
+                    cmd.Parameters.AddWithValue("name", container.Name + uniqueNameGen);
+                    cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+                    cmd.Parameters.AddWithValue("parent", parentID);
+                    int nrows = cmd.ExecuteNonQuery();
+                    sqlConnection.Close();
+
+                    if (nrows <= 0) return BadRequest("Could not create container resource");
+                    return Ok(nrows);
+                }
+                catch (Exception ex)
+                {
+                    if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                    uniqueNameGen = "(" + ++tries + ")";
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                }
             }
         }
 
