@@ -36,9 +36,9 @@ namespace SOMIOD.Controllers
             }
             catch (Exception ex) 
             {
-                System.Diagnostics.Debug.WriteLine(ex.Message);
                 if (!sqlDataReader.IsClosed) sqlDataReader.Close();
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                System.Diagnostics.Debug.WriteLine(ex.Message);
             }
 
             return parentID;
@@ -187,23 +187,30 @@ namespace SOMIOD.Controllers
         public IHttpActionResult Post([FromBody]Application app)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            try
-            {
-                sqlConnection.Open();
 
-                SqlCommand cmd = new SqlCommand("INSERT INTO Applications VALUES (@name, @creation_dt)", sqlConnection);
-                cmd.Parameters.AddWithValue("name", app.Name);
-                cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
-                int nrows = cmd.ExecuteNonQuery();
-                sqlConnection.Close();
-
-                if (nrows <= 0) return BadRequest("Could not create application resource");
-                return Ok(nrows);
-            }
-            catch (Exception ex)
+            int tries = 0;
+            string uniqueNameGen = "";
+            while (true)
             {
-                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
-                return BadRequest(ex.Message);
+                try
+                {
+                    sqlConnection.Open();
+
+                    SqlCommand cmd = new SqlCommand("INSERT INTO Applications VALUES (@name, @creation_dt)", sqlConnection);
+                    cmd.Parameters.AddWithValue("name", app.Name + uniqueNameGen);
+                    cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+                    int nrows = cmd.ExecuteNonQuery();
+                    sqlConnection.Close();
+
+                    if (nrows <= 0) return BadRequest("Could not create application resource");
+                    return Ok(nrows);
+                }
+                catch (Exception ex)
+                {
+                    if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                    uniqueNameGen = "(" + ++tries + ")";
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                }
             }
         }
 

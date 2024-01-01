@@ -39,9 +39,9 @@ namespace SOMIOD.Controllers
             } 
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(ex.Message);
                 if (!sqlDataReader.IsClosed) sqlDataReader.Close();
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                System.Diagnostics.Debug.WriteLine(ex.Message);
             }
 
             return parentID;

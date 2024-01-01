@@ -37,6 +37,7 @@ namespace SOMIOD.Controllers
             {
                 if (!sqlDataReader.IsClosed) sqlDataReader.Close();
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                System.Diagnostics.Debug.WriteLine(ex.Message);
             }
 
             return parentID;
