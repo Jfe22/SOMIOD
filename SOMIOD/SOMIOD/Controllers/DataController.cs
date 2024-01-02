@@ -93,30 +93,36 @@ namespace SOMIOD.Controllers
         public IHttpActionResult Post(string contName, [FromBody] Data data)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            try
-            {
-                int parentID = FetchParentId(contName);
-                sqlConnection.Open();
+            //apenas descomentar se comecarmos a usar Name no model da data -- MANDAR MAIL A PROF
+            //int tries = 0;
+            //string uniqueNameGen = "";
+            //while (true)
+            //{
+                try
+                {
+                    int parentID = FetchParentId(contName);
+                    sqlConnection.Open();
 
-                SqlCommand cmd = new SqlCommand("INSERT INTO Data VALUES (@content, @creation_dt, @parent)", sqlConnection);
-                cmd.Parameters.AddWithValue("content", data.Content);
-                cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
-                cmd.Parameters.AddWithValue("parent", parentID);
-                int nrows = cmd.ExecuteNonQuery();
-                sqlConnection.Close();
+                    SqlCommand cmd = new SqlCommand("INSERT INTO Data VALUES (@content, @creation_dt, @parent)", sqlConnection);
+                    cmd.Parameters.AddWithValue("content", data.Content);
+                    cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+                    cmd.Parameters.AddWithValue("parent", parentID);
+                    int nrows = cmd.ExecuteNonQuery();
+                    sqlConnection.Close();
 
-                //publish mensage here??
-                //MttqClient teste = new MttqClient("IPAddress.Parse("...
-                //----------------------
+                    //publish mensage here??
+                    //MttqClient teste = new MttqClient("IPAddress.Parse("...
+                    //----------------------
 
-                if (nrows <= 0) return BadRequest("Could not create data resource");
-                return Ok(nrows);
-            }
-            catch (Exception ex)
-            {
-                if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
-                return BadRequest(ex.Message);
-            }
+                    if (nrows <= 0) return BadRequest("Could not create data resource");
+                    return Ok(nrows);
+                }
+                catch (Exception ex)
+                {
+                    if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                    return BadRequest(ex.Message);
+                }
+            //}
         }
 
 

@@ -180,6 +180,7 @@ namespace SOMIOD.Controllers
         public IHttpActionResult Post(string appName, [FromBody]Container container)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
+            int parentID = FetchParentId(appName, "Applications");
 
             int tries = 0;
             string uniqueNameGen = "";
@@ -187,7 +188,6 @@ namespace SOMIOD.Controllers
             {
                 try
                 {
-                    int parentID = FetchParentId(appName, "Applications");
                     sqlConnection.Open();
 
                     SqlCommand cmd = new SqlCommand("INSERT INTO Containers VALUES (@name, @creation_dt, @parent)", sqlConnection);
