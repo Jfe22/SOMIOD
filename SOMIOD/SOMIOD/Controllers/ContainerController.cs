@@ -52,9 +52,9 @@ namespace SOMIOD.Controllers
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null;
             List<Data> dataList = new List<Data>();
+            int parentID = FetchParentId(contName, "Containers");
             try
             {
-                int parentID = FetchParentId(contName, "Containers");
                 sqlConnection.Open();
 
                 SqlCommand cmd = new SqlCommand("SELECT * FROM Data WHERE Parent = @parentID", sqlConnection);
@@ -89,9 +89,9 @@ namespace SOMIOD.Controllers
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null;
             List<Subscription> subscriptions = new List<Subscription>();
+            int parentID = FetchParentId(contName, "Containers");
             try
             {
-                int parentID = FetchParentId(contName, "Containers");
                 sqlConnection.Open();
 
                 SqlCommand cmd = new SqlCommand("SELECT * FROM Subscriptions WHERE Parent = @parentID", sqlConnection);
@@ -141,10 +141,10 @@ namespace SOMIOD.Controllers
 
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null;
+            Container returnCont = null;
+            int parentID = FetchParentId(appName, "Applications");
             try
             {
-                Container returnCont = null;
-                int parentID = FetchParentId(appName, "Applications");
                 sqlConnection.Open();
 
                 SqlCommand cmd = new SqlCommand("SELECT * FROM Containers WHERE Parent = @parentID AND Name = @contName", sqlConnection);
@@ -181,7 +181,6 @@ namespace SOMIOD.Controllers
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             int parentID = FetchParentId(appName, "Applications");
-
             int tries = 0;
             string uniqueNameGen = "";
             while (true)
@@ -221,8 +220,6 @@ namespace SOMIOD.Controllers
                 SqlCommand cmd = new SqlCommand("UPDATE Containers SET name = @name, parent = @parent WHERE name = @nameOld", sqlConnection);
                 cmd.Parameters.AddWithValue("name", container.Name);
                 cmd.Parameters.AddWithValue("parent", parentID);
-                //here we might want to change the parent so routeParent != requestParent and this makes sense 
-                //cmd.Parameters.AddWithValue("parent", container.Parent);
                 cmd.Parameters.AddWithValue("nameOld", contName);
                 int nrows = cmd.ExecuteNonQuery();
                 sqlConnection.Close();

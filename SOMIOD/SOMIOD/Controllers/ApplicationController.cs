@@ -83,9 +83,9 @@ namespace SOMIOD.Controllers
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null;
             List<Container> containers = new List<Container>();
+            int parentID = FetchParentId(appName);
             try
             {
-                int parentID = FetchParentId(appName);
                 sqlConnection.Open();
 
                 SqlCommand cmd = new SqlCommand("SELECT * FROM Containers WHERE Parent = @parentID", sqlConnection);
@@ -187,7 +187,6 @@ namespace SOMIOD.Controllers
         public IHttpActionResult Post([FromBody]Application app)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-
             int tries = 0;
             string uniqueNameGen = "";
             while (true)
@@ -226,8 +225,6 @@ namespace SOMIOD.Controllers
                 SqlCommand cmd = new SqlCommand("UPDATE Applications SET name=@nameNew WHERE name=@nameOld", sqlConnection);
                 cmd.Parameters.AddWithValue("nameNew", app.Name);
                 cmd.Parameters.AddWithValue("nameOld", appName);
-                //should time also change when updated???
-                //cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
                 int nrows = cmd.ExecuteNonQuery();
                 sqlConnection.Close();
 

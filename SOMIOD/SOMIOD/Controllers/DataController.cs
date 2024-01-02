@@ -52,10 +52,10 @@ namespace SOMIOD.Controllers
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null;
+            Data returnData = null;
+            int parentID = FetchParentId(contName);
             try
             {
-                Data returnData = null;
-                int parentID = FetchParentId(contName);
                 sqlConnection.Open();
 
                 SqlCommand cmd = new SqlCommand("SELECT * FROM Data WHERE Parent = @parentID AND Id = @dataId", sqlConnection);

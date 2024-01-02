@@ -50,10 +50,10 @@ namespace SOMIOD.Controllers
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null; 
+            Subscription returnSub = null;
+            int parentID = FetchParentId(contName);
             try
             {
-                Subscription returnSub = null;
-                int parentID = FetchParentId(contName);
                 sqlConnection.Open();
 
                 SqlCommand cmd = new SqlCommand("SELECT * FROM Subscriptions WHERE Parent = @parentID AND Name = @subName", sqlConnection);
@@ -91,7 +91,6 @@ namespace SOMIOD.Controllers
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             int parentID = FetchParentId(contName);
-
             int tries = 0;
             string uniqueNameGen = "";
             while (true)
