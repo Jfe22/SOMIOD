@@ -102,6 +102,7 @@ namespace SOMIOD.Controllers
                     SqlCommand cmd = new SqlCommand("INSERT INTO Subscriptions VALUES (@name, @creation_dt, @parent, @event, @endpoint)", sqlConnection);
                     cmd.Parameters.AddWithValue("name", subscription.Name + uniqueNameGen);
                     cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+                    System.Diagnostics.Debug.WriteLine(parentID);
                     cmd.Parameters.AddWithValue("parent", parentID);
                     cmd.Parameters.AddWithValue("event", subscription.Event);
                     cmd.Parameters.AddWithValue("endpoint", subscription.Endpoint);

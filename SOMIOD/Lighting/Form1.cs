@@ -78,10 +78,10 @@ namespace Lighting
                 Subscription subscription = new Subscription
                 {
                     Name = "sub1",
-                    Event = "pdahahaha",
-                    Endpoint = "poragorasla",
+                    Event = "1",
+                    Endpoint = "localhost",
                 };
-                RestRequest requestCreateSub = new RestRequest("lighting/lighting_bulb/subscriptions", Method.Post);
+                RestRequest requestCreateSub = new RestRequest("lighting/light_bulb/sub", Method.Post);
                 requestCreateSub.AddObject(subscription);
                 RestResponse responseCreateSub = restClient.Execute(requestCreateCont);
             }
