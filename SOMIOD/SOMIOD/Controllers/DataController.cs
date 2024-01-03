@@ -47,8 +47,8 @@ namespace SOMIOD.Controllers
 
         //---------------- HTTP -----------------
         //considering data has no name field, which attribute should we use in route? ---> curr using ID
-        [Route("api/somiod/{appName}/{contName}/data/{dataId}")]
-        public IHttpActionResult Get(string contName, string dataId)
+        [Route("api/somiod/{appName}/{contName}/data/{dataName}")]
+        public IHttpActionResult Get(string contName, string dataName)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null;
@@ -58,15 +58,16 @@ namespace SOMIOD.Controllers
             {
                 sqlConnection.Open();
 
-                SqlCommand cmd = new SqlCommand("SELECT * FROM Data WHERE Parent = @parentID AND Id = @dataId", sqlConnection);
+                SqlCommand cmd = new SqlCommand("SELECT * FROM Data WHERE Parent = @parentID AND Name = @dataName", sqlConnection);
                 cmd.Parameters.AddWithValue("parentID", parentID);
-                cmd.Parameters.AddWithValue("dataId", dataId);
+                cmd.Parameters.AddWithValue("dataName", dataName);
                 sqlDataReader = cmd.ExecuteReader();
                 if (sqlDataReader.Read())
                 {
                     returnData = new Data()
                     {
                         Id = (int)sqlDataReader["Id"],
+                        Name = (string)sqlDataReader["Name"],
                         Content = (string)sqlDataReader["Content"],
                         Creation_dt = (string)sqlDataReader["Creation_dt"],
                         Parent = (int)sqlDataReader["Parent"],
@@ -93,17 +94,17 @@ namespace SOMIOD.Controllers
         public IHttpActionResult Post(string contName, [FromBody] Data data)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            //apenas descomentar se comecarmos a usar Name no model da data -- MANDAR MAIL A PROF
-            //int tries = 0;
-            //string uniqueNameGen = "";
-            //while (true)
-            //{
+            int parentID = FetchParentId(contName);
+            int tries = 0;
+            string uniqueNameGen = "";
+            while (true)
+            {
                 try
                 {
-                    int parentID = FetchParentId(contName);
                     sqlConnection.Open();
 
-                    SqlCommand cmd = new SqlCommand("INSERT INTO Data VALUES (@content, @creation_dt, @parent)", sqlConnection);
+                    SqlCommand cmd = new SqlCommand("INSERT INTO Data VALUES (@name, @content, @creation_dt, @parent)", sqlConnection);
+                    cmd.Parameters.AddWithValue("name", data.Name + uniqueNameGen);
                     cmd.Parameters.AddWithValue("content", data.Content);
                     cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
                     cmd.Parameters.AddWithValue("parent", parentID);
@@ -120,9 +121,10 @@ namespace SOMIOD.Controllers
                 catch (Exception ex)
                 {
                     if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
-                    return BadRequest(ex.Message);
+                    uniqueNameGen = "(" + ++tries + ")";
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
                 }
-            //}
+            }
         }
 
 
@@ -139,7 +141,8 @@ namespace SOMIOD.Controllers
                 int parentID = FetchParentId(contName);
                 sqlConnection.Open();
 
-                SqlCommand cmd = new SqlCommand("UPDATE Data SET content = @content, parent = @parent WHERE id = @dataId", sqlConnection);
+                SqlCommand cmd = new SqlCommand("UPDATE Data SET content = @content, parent = @parent, name = @name WHERE id = @dataId", sqlConnection);
+                cmd.Parameters.AddWithValue("name", data.Name);
                 cmd.Parameters.AddWithValue("content", data.Content);
                 cmd.Parameters.AddWithValue("parent", parentID);
                 cmd.Parameters.AddWithValue("dataId", dataId);

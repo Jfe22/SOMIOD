@@ -44,6 +44,7 @@ namespace Switch
         {
             SOMIOD.Models.Data data = new SOMIOD.Models.Data
             {
+                Name = "ON",
                 Content = "ON"
             };
             RestRequest requestCreateData = new RestRequest("ligthing/light_bulb/data", Method.Post);
@@ -55,6 +56,7 @@ namespace Switch
         {
             SOMIOD.Models.Data data = new SOMIOD.Models.Data
             {
+                Name = "OFF",
                 Content = "OFF"
             };
             RestRequest requestCreateData = new RestRequest("ligthing/light_bulb/data", Method.Post);

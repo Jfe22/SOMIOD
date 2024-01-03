@@ -65,6 +65,7 @@ namespace SOMIOD.Controllers
                     Data data = new Data()
                     {
                         Id = (int)sqlDataReader["Id"],
+                        Name = (string)sqlDataReader["Name"],
                         Content = (string)sqlDataReader["Content"],
                         Creation_dt = (string)sqlDataReader["Creation_dt"],
                         Parent = (int)sqlDataReader["Parent"],

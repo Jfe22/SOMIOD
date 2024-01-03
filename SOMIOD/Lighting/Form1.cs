@@ -31,15 +31,15 @@ namespace Lighting
             InitializeComponent();
             restClient = new RestClient(baseURI);
            // mqttClient = new MqttClient(IPAddress.Parse("127.0.0.1"));
-            mqttClient = new MqttClient("127.0.0.1");
-            string[] mStrTopicsInfo = { "create", "destroy" };
-            mqttClient.Connect(Guid.NewGuid().ToString());
-            if (!mqttClient.IsConnected) MessageBox.Show("Erro ao ligar sockets");
+           // mqttClient = new MqttClient("127.0.0.1");
+           // string[] mStrTopicsInfo = { "create", "destroy" };
+           // mqttClient.Connect(Guid.NewGuid().ToString());
+           // if (!mqttClient.IsConnected) MessageBox.Show("Erro ao ligar sockets");
 
-            mqttClient.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
-            byte[] qosLevels = { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE };
+            //mqttClient.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
+            //byte[] qosLevels = { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE };
 
-            mqttClient.Subscribe(mStrTopicsInfo, qosLevels);
+            //mqttClient.Subscribe(mStrTopicsInfo, qosLevels);
         }
 
         private void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
@@ -59,7 +59,7 @@ namespace Lighting
                 {
                     Name = "Lighting"
                 };
-                RestRequest requestCreateApp = new RestRequest("applications", Method.Post);
+                RestRequest requestCreateApp = new RestRequest("", Method.Post);
                 requestCreateApp.AddObject(application);
                 RestResponse responseCreateApp = restClient.Execute(requestCreateApp);
                 if (responseCreateApp.StatusCode != System.Net.HttpStatusCode.OK) return;
@@ -86,23 +86,12 @@ namespace Lighting
                 RestResponse responseCreateSub = restClient.Execute(requestCreateCont);
             }
 
-            /* ------- if we using put ------------------
-            RestRequest requestData = new RestRequest("lighting/light_bulb/data/8", Method.Get);
-            requestData.RequestFormat = DataFormat.Xml;
-            //var responseData = restClient.Execute<Data>(requestData).Data;
-            Data responseData = restClient.Execute<Data>(requestData).Data;
-            if (responseData == null) textBoxLightValue.Text = "No data yet";
-            else textBoxLightValue.Text = responseData.Content;
-            ------- if we using put ------------------ */ 
             RestRequest requestData = new RestRequest("lighting/light_bulb", Method.Get);
             requestData.RequestFormat = DataFormat.Xml;
             requestData.AddHeader("somiod-discover", "data");
-            //var responseData = restClient.Execute<Data>(requestData).Data;
             List<Data> responseData = restClient.Execute<List<Data>>(requestData).Data;
-            if (responseData == null) textBoxLightValue.Text = "No data yet";
+            if (responseData == null || responseData.Count == 0) textBoxLightValue.Text = "No data yet";
             else textBoxLightValue.Text = responseData[responseData.Count - 1].Content;
-            
-            //turn the websocket on here as a listener???
 
         }
     }
