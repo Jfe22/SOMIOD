@@ -114,6 +114,37 @@ namespace SOMIOD.Controllers
 
             return Ok(containers);
         }
+
+        public IHttpActionResult CreateContainer(string appName, [FromBody]Container container)
+        {
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            int parentID = FetchParentId(appName);
+            int tries = 0;
+            string uniqueNameGen = "";
+            while (true)
+            {
+                try
+                {
+                    sqlConnection.Open();
+
+                    SqlCommand cmd = new SqlCommand("INSERT INTO Containers VALUES (@name, @creation_dt, @parent)", sqlConnection);
+                    cmd.Parameters.AddWithValue("name", container.Name + uniqueNameGen);
+                    cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+                    cmd.Parameters.AddWithValue("parent", parentID);
+                    int nrows = cmd.ExecuteNonQuery();
+                    sqlConnection.Close();
+
+                    if (nrows <= 0) return BadRequest("Could not create container resource");
+                    return Ok(nrows);
+                }
+                catch (Exception ex)
+                {
+                    if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                    uniqueNameGen = "(" + ++tries + ")";
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                }
+            }
+        }
         //---------------- --- -----------------
 
 
@@ -211,6 +242,13 @@ namespace SOMIOD.Controllers
                     System.Diagnostics.Debug.WriteLine(ex.Message);
                 }
             }
+        }
+        
+        [Route("api/somiod/{appName}")]
+        public IHttpActionResult PostContainer(string appName, [FromBody]Container container)
+        {
+            //which guard rails to add?
+            return CreateContainer(appName, container);
         }
 
 

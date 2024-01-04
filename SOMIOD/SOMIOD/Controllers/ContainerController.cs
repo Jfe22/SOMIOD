@@ -176,38 +176,6 @@ namespace SOMIOD.Controllers
             }
         }
 
-        // TODO: need to be just [Route("api/somiod/{appName}")] but we get conflicts with the appcontroller 
-        [Route("api/somiod/{appName}/containers")]
-        public IHttpActionResult Post(string appName, [FromBody]Container container)
-        {
-            SqlConnection sqlConnection = new SqlConnection(connectionString);
-            int parentID = FetchParentId(appName, "Applications");
-            int tries = 0;
-            string uniqueNameGen = "";
-            while (true)
-            {
-                try
-                {
-                    sqlConnection.Open();
-
-                    SqlCommand cmd = new SqlCommand("INSERT INTO Containers VALUES (@name, @creation_dt, @parent)", sqlConnection);
-                    cmd.Parameters.AddWithValue("name", container.Name + uniqueNameGen);
-                    cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
-                    cmd.Parameters.AddWithValue("parent", parentID);
-                    int nrows = cmd.ExecuteNonQuery();
-                    sqlConnection.Close();
-
-                    if (nrows <= 0) return BadRequest("Could not create container resource");
-                    return Ok(nrows);
-                }
-                catch (Exception ex)
-                {
-                    if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
-                    uniqueNameGen = "(" + ++tries + ")";
-                    System.Diagnostics.Debug.WriteLine(ex.Message);
-                }
-            }
-        }
 
         [Route("api/somiod/{appName}/{contName}")]
         public IHttpActionResult Put(string appName, string contName, [FromBody]Container container)

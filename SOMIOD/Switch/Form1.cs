@@ -33,7 +33,7 @@ namespace Switch
                 {
                     Name = "Switch"
                 };
-                RestRequest requestCreateSwitch = new RestRequest("applications", Method.Post);
+                RestRequest requestCreateSwitch = new RestRequest("", Method.Post);
                 requestCreateSwitch.AddObject(application);
                 RestResponse responseCreateSwitch = restClient.Execute(requestCreateSwitch);
             }
