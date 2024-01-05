@@ -124,8 +124,6 @@ namespace SOMIOD.Controllers
             return Ok(subscriptions);
         }
 
-
-        //adicionar aqui os metodos aux de criacao de subs e data, copiar post dos respetivos controllers
         public IHttpActionResult CreateData(string contName, Data data)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
@@ -161,6 +159,7 @@ namespace SOMIOD.Controllers
                 }
             }
         }
+
         public IHttpActionResult CreateSubscription(string contName, Subscription subscription)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
@@ -194,11 +193,6 @@ namespace SOMIOD.Controllers
                 }
             }
         }
-        // ---
-        // ...
-        // ---
-        //---------------- 
-
         //---------------- --- -----------------
 
         //---------------- HTTP -----------------

@@ -46,7 +46,6 @@ namespace SOMIOD.Controllers
 
 
         //---------------- HTTP -----------------
-        //considering data has no name field, which attribute should we use in route? ---> curr using ID
         [Route("api/somiod/{appName}/{contName}/data/{dataName}")]
         public IHttpActionResult Get(string contName, string dataName)
         {
