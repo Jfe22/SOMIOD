@@ -86,40 +86,12 @@ namespace SOMIOD.Controllers
             }
         }
 
+        /* ---------- POST HANDLED BY CONTAINERCONTROLLER --------------
         [Route("api/somiod/{appName}/{contName}/sub")]
         public IHttpActionResult Post(string contName, [FromBody]Subscription subscription)
         {
-            SqlConnection sqlConnection = new SqlConnection(connectionString);
-            int parentID = FetchParentId(contName);
-            int tries = 0;
-            string uniqueNameGen = "";
-            while (true)
-            {
-                try
-                {
-                    sqlConnection.Open();
-
-                    SqlCommand cmd = new SqlCommand("INSERT INTO Subscriptions VALUES (@name, @creation_dt, @parent, @event, @endpoint)", sqlConnection);
-                    cmd.Parameters.AddWithValue("name", subscription.Name + uniqueNameGen);
-                    cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
-                    System.Diagnostics.Debug.WriteLine(parentID);
-                    cmd.Parameters.AddWithValue("parent", parentID);
-                    cmd.Parameters.AddWithValue("event", subscription.Event);
-                    cmd.Parameters.AddWithValue("endpoint", subscription.Endpoint);
-                    int nrows = cmd.ExecuteNonQuery();
-                    sqlConnection.Close();
-
-                    if (nrows <= 0) return BadRequest("Could not create subscription resource");
-                    return Ok(nrows);
-                }
-                catch (Exception ex)
-                {
-                    if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
-                    uniqueNameGen = "(" + ++tries + ")";
-                    System.Diagnostics.Debug.WriteLine(ex.Message);
-                }
-            }
         }
+        ---------- POST HANDLED BY CONTAINERCONTROLLER -------------- */ 
 
         [Route("api/somiod/{appName}/{contName}/sub/{subName}")]
         public IHttpActionResult Put(string contName, string subName, [FromBody]Subscription subscription)

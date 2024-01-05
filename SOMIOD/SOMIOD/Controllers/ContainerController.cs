@@ -36,7 +36,7 @@ namespace SOMIOD.Controllers
 
                 sqlDataReader.Close();
                 sqlConnection.Close();
-            } 
+            }
             catch (Exception ex)
             {
                 if (!sqlDataReader.IsClosed) sqlDataReader.Close();
@@ -123,6 +123,82 @@ namespace SOMIOD.Controllers
 
             return Ok(subscriptions);
         }
+
+
+        //adicionar aqui os metodos aux de criacao de subs e data, copiar post dos respetivos controllers
+        public IHttpActionResult CreateData(string contName, Data data)
+        {
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            int parentID = FetchParentId(contName, "Containers");
+            int tries = 0;
+            string uniqueNameGen = "";
+            while (true)
+            {
+                try
+                {
+                    sqlConnection.Open();
+
+                    SqlCommand cmd = new SqlCommand("INSERT INTO Data VALUES (@name, @content, @creation_dt, @parent)", sqlConnection);
+                    cmd.Parameters.AddWithValue("name", data.Name + uniqueNameGen);
+                    cmd.Parameters.AddWithValue("content", data.Content);
+                    cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+                    cmd.Parameters.AddWithValue("parent", parentID);
+                    int nrows = cmd.ExecuteNonQuery();
+                    sqlConnection.Close();
+
+                    //publish mensage here??
+                    //MttqClient teste = new MttqClient("IPAddress.Parse("...
+                    //----------------------
+
+                    if (nrows <= 0) return BadRequest("Could not create data resource");
+                    return Ok(nrows);
+                }
+                catch (Exception ex)
+                {
+                    if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                    uniqueNameGen = "(" + ++tries + ")";
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                }
+            }
+        }
+        public IHttpActionResult CreateSubscription(string contName, Subscription subscription)
+        {
+            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            int parentID = FetchParentId(contName, "Containers");
+            int tries = 0;
+            string uniqueNameGen = "";
+            while (true)
+            {
+                try
+                {
+                    sqlConnection.Open();
+
+                    SqlCommand cmd = new SqlCommand("INSERT INTO Subscriptions VALUES (@name, @creation_dt, @parent, @event, @endpoint)", sqlConnection);
+                    cmd.Parameters.AddWithValue("name", subscription.Name + uniqueNameGen);
+                    cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
+                    System.Diagnostics.Debug.WriteLine(parentID);
+                    cmd.Parameters.AddWithValue("parent", parentID);
+                    cmd.Parameters.AddWithValue("event", subscription.Event);
+                    cmd.Parameters.AddWithValue("endpoint", subscription.Endpoint);
+                    int nrows = cmd.ExecuteNonQuery();
+                    sqlConnection.Close();
+
+                    if (nrows <= 0) return BadRequest("Could not create subscription resource");
+                    return Ok(nrows);
+                }
+                catch (Exception ex)
+                {
+                    if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
+                    uniqueNameGen = "(" + ++tries + ")";
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                }
+            }
+        }
+        // ---
+        // ...
+        // ---
+        //---------------- 
+
         //---------------- --- -----------------
 
         //---------------- HTTP -----------------
@@ -132,9 +208,9 @@ namespace SOMIOD.Controllers
             if (Request.Headers.Contains("somiod-discover"))
             {
                 if ("data" == Request.Headers.GetValues("somiod-discover").FirstOrDefault())
-                    return DiscoverData(contName); 
+                    return DiscoverData(contName);
                 if ("subscription" == Request.Headers.GetValues("somiod-discover").FirstOrDefault())
-                    return DiscoverSubscriptions(contName); 
+                    return DiscoverSubscriptions(contName);
 
                 return BadRequest("Invalid somiod-discover header value. " +
                     "Did you mean 'data' or 'subscription'?");
@@ -176,6 +252,36 @@ namespace SOMIOD.Controllers
             }
         }
 
+        [Route("api/somiod/{appName}/{contName}")]
+        public IHttpActionResult Post(string appName, string contName, [FromBody]RequestCreateDataSubscription resource)
+        {
+            if (resource.Res_type == "data")
+            {
+                if (resource.Content == null) return BadRequest("Content can't be empty");
+                Data parcialData = new Data()
+                {
+                    Name = resource.Name,
+                    Content = resource.Content
+                };
+                return CreateData(contName, parcialData);
+            }
+
+            if (resource.Res_type == "subscription")
+            {
+                if (resource.Event == null) return BadRequest("Event can't be empty");
+                if (resource.Endpoint == null) return BadRequest("Endpoint can't be empty");
+                Subscription partialSubscription = new Subscription()
+                {
+                    Name = resource.Name,
+                    Event = resource.Event,
+                    Endpoint = resource.Endpoint
+                };
+                return CreateSubscription(contName, partialSubscription);
+            }
+
+            return BadRequest("POSTING TO THIS ENDPOINT REQUIRES THE USE OF res_type BODY PARAM. " +
+                "USAGE: 'res_type: data' OR 'res_type: subscription");
+        }
 
         [Route("api/somiod/{appName}/{contName}")]
         public IHttpActionResult Put(string appName, string contName, [FromBody]Container container)

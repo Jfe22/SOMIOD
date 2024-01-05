@@ -90,42 +90,12 @@ namespace SOMIOD.Controllers
 
 
 
+        /* ---------- POST HANDLED BY CONTAINERCONTROLLER --------------
         [Route("api/somiod/{appName}/{contName}/data")]
         public IHttpActionResult Post(string contName, [FromBody] Data data)
         {
-            SqlConnection sqlConnection = new SqlConnection(connectionString);
-            int parentID = FetchParentId(contName);
-            int tries = 0;
-            string uniqueNameGen = "";
-            while (true)
-            {
-                try
-                {
-                    sqlConnection.Open();
-
-                    SqlCommand cmd = new SqlCommand("INSERT INTO Data VALUES (@name, @content, @creation_dt, @parent)", sqlConnection);
-                    cmd.Parameters.AddWithValue("name", data.Name + uniqueNameGen);
-                    cmd.Parameters.AddWithValue("content", data.Content);
-                    cmd.Parameters.AddWithValue("creation_dt", DateTime.Now.ToString("yyyy-M-dd H:m:ss"));
-                    cmd.Parameters.AddWithValue("parent", parentID);
-                    int nrows = cmd.ExecuteNonQuery();
-                    sqlConnection.Close();
-
-                    //publish mensage here??
-                    //MttqClient teste = new MttqClient("IPAddress.Parse("...
-                    //----------------------
-
-                    if (nrows <= 0) return BadRequest("Could not create data resource");
-                    return Ok(nrows);
-                }
-                catch (Exception ex)
-                {
-                    if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
-                    uniqueNameGen = "(" + ++tries + ")";
-                    System.Diagnostics.Debug.WriteLine(ex.Message);
-                }
-            }
         }
+        ---------- POST HANDLED BY CONTAINERCONTROLLER -------------- */ 
 
 
         [Route("api/somiod/{appName}/{contName}/data/{dataId}")]
