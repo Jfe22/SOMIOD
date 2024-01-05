@@ -30,20 +30,20 @@ namespace Lighting
         {
             InitializeComponent();
             restClient = new RestClient(baseURI);
-           // mqttClient = new MqttClient(IPAddress.Parse("127.0.0.1"));
-           // mqttClient = new MqttClient("127.0.0.1");
-           // string[] mStrTopicsInfo = { "create", "destroy" };
-           // mqttClient.Connect(Guid.NewGuid().ToString());
-           // if (!mqttClient.IsConnected) MessageBox.Show("Erro ao ligar sockets");
+            mqttClient = new MqttClient("127.0.0.1");
+            string[] mStrTopicsInfo = { "create", "destroy" };
+            mqttClient.Connect(Guid.NewGuid().ToString());
+            if (!mqttClient.IsConnected) MessageBox.Show("Erro ao ligar sockets");
 
-            //mqttClient.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
-            //byte[] qosLevels = { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE };
+            mqttClient.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
+            byte[] qosLevels = { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE };
 
-            //mqttClient.Subscribe(mStrTopicsInfo, qosLevels);
+            mqttClient.Subscribe(mStrTopicsInfo, qosLevels);
         }
 
         private void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine("GOT SOME");
             textBoxLightValue.Text = Encoding.UTF8.GetString(e.Message);
         }
 
@@ -78,7 +78,7 @@ namespace Lighting
                 Subscription subscription = new Subscription
                 {
                     Name = "sub1",
-                    Event = "1",
+                    Event = 1,
                     Endpoint = "localhost",
                 };
                 RestRequest requestCreateSub = new RestRequest("lighting/light_bulb/sub", Method.Post);

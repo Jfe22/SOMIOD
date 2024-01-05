@@ -42,6 +42,7 @@ namespace Switch
         //dataId is hardcoded, will the app suport more then one light???
         private void buttonLightOn_Click(object sender, EventArgs e)
         {
+            /*
             SOMIOD.Models.Data data = new SOMIOD.Models.Data
             {
                 Name = "ON",
@@ -50,10 +51,23 @@ namespace Switch
             RestRequest requestCreateData = new RestRequest("ligthing/light_bulb/data", Method.Post);
             requestCreateData.AddObject(data);
             RestResponse responseCreateData = restClient.Execute(requestCreateData);
+            */
+
+            RequestCreateDataSubscription requestBody = new RequestCreateDataSubscription()
+            {
+                Res_type = "data",
+                Name = "ON",
+                Content = "ON"
+            };
+            RestRequest requestCreateData = new RestRequest("lighting/light_bulb", Method.Post);
+            requestCreateData.AddObject(requestBody);
+            RestResponse responseCreateData = restClient.Execute(requestCreateData);
+
         }
 
         private void buttonLightOff_Click(object sender, EventArgs e)
         {
+            /*
             SOMIOD.Models.Data data = new SOMIOD.Models.Data
             {
                 Name = "OFF",
@@ -62,6 +76,17 @@ namespace Switch
             RestRequest requestCreateData = new RestRequest("ligthing/light_bulb/data", Method.Post);
             requestCreateData.AddObject(data);
             RestResponse responseCreateData = restClient.Execute(requestCreateData);
+            */
+            RequestCreateDataSubscription requestBody = new RequestCreateDataSubscription()
+            {
+                Res_type = "data",
+                Name = "OFF",
+                Content = "OFF"
+            };
+            RestRequest requestCreateData = new RestRequest("ligthing/light_bulb", Method.Post);
+            requestCreateData.AddObject(requestBody);
+            RestResponse responseCreateData = restClient.Execute(requestCreateData);
+            
         }
     }
 }

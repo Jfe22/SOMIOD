@@ -68,7 +68,7 @@ namespace SOMIOD.Controllers
                         Name = (string)sqlDataReader["Name"],
                         Creation_dt = (string)sqlDataReader["Creation_dt"],
                         Parent = (int)sqlDataReader["Parent"],
-                        Event = (string)sqlDataReader["Event"],
+                        Event = (int)sqlDataReader["Event"],
                         Endpoint = (string)sqlDataReader["Endpoint"],
                     };
                 }

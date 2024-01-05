@@ -5,7 +5,9 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Web.Http;
+using uPLibrary.Networking.M2Mqtt;
 
 namespace SOMIOD.Controllers
 {
@@ -14,6 +16,13 @@ namespace SOMIOD.Controllers
 
         //---------------- AUX -----------------
         string connectionString = SOMIOD.Properties.Settings.Default.ConnStr;
+        string mqttBrokerString = "127.0.0.1";
+
+        MqttClient mqttClient = null;
+        string[] mStrTopicsInfo = {"creation", "deletion"};
+
+        //mqttClient = new MqttClient(mqttBrokerString); 
+
         public int FetchParentId(string resName, string resType)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
@@ -47,7 +56,7 @@ namespace SOMIOD.Controllers
             return parentID;
         }
 
-        public IHttpActionResult DiscoverData(string contName)
+        public List<Data> DiscoverData(string contName)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null;
@@ -79,13 +88,14 @@ namespace SOMIOD.Controllers
             {
                 if (!sqlDataReader.IsClosed) sqlDataReader.Close();
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
-                return BadRequest(ex.Message);
+                //return BadRequest(ex.Message);
             }
 
-            return Ok(dataList);
+            //return Ok(dataList);
+            return dataList;
         }
 
-        public IHttpActionResult DiscoverSubscriptions(string contName)
+        public List<Subscription> DiscoverSubscriptions(string contName)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             SqlDataReader sqlDataReader = null;
@@ -106,7 +116,7 @@ namespace SOMIOD.Controllers
                         Name = (string)sqlDataReader["Name"],
                         Creation_dt = (string)sqlDataReader["Creation_dt"],
                         Parent = (int)sqlDataReader["Parent"],
-                        Event = (string)sqlDataReader["Event"],
+                        Event = (int)sqlDataReader["Event"],
                         Endpoint = (string)sqlDataReader["Endpoint"],
                     };
                     subscriptions.Add(subscription);
@@ -118,10 +128,11 @@ namespace SOMIOD.Controllers
             {
                 if (!sqlDataReader.IsClosed) sqlDataReader.Close();
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
-                return BadRequest(ex.Message);
+                //return BadRequest(ex.Message);
             }
 
-            return Ok(subscriptions);
+            //return Ok(subscriptions);
+            return subscriptions;
         }
 
         public IHttpActionResult CreateData(string contName, Data data)
@@ -147,6 +158,7 @@ namespace SOMIOD.Controllers
                     //publish mensage here??
                     //MttqClient teste = new MttqClient("IPAddress.Parse("...
                     //----------------------
+                    //getSub(parentID, )
 
                     if (nrows <= 0) return BadRequest("Could not create data resource");
                     return Ok(nrows);
@@ -202,9 +214,9 @@ namespace SOMIOD.Controllers
             if (Request.Headers.Contains("somiod-discover"))
             {
                 if ("data" == Request.Headers.GetValues("somiod-discover").FirstOrDefault())
-                    return DiscoverData(contName);
+                    return Ok(DiscoverData(contName));
                 if ("subscription" == Request.Headers.GetValues("somiod-discover").FirstOrDefault())
-                    return DiscoverSubscriptions(contName);
+                    return Ok(DiscoverSubscriptions(contName));
 
                 return BadRequest("Invalid somiod-discover header value. " +
                     "Did you mean 'data' or 'subscription'?");
@@ -251,18 +263,43 @@ namespace SOMIOD.Controllers
         {
             if (resource.Res_type == "data")
             {
+
                 if (resource.Content == null) return BadRequest("Content can't be empty");
                 Data parcialData = new Data()
                 {
                     Name = resource.Name,
                     Content = resource.Content
                 };
+
+                //check who subed this container
+                //send content(data) to broker, endpoint
+                List<Subscription> subs = new List<Subscription>();
+                //subs = (List<Subscription>)DiscoverSubscriptions(contName);
+                subs = DiscoverSubscriptions(contName);
+                foreach (Subscription sub in subs)
+                {
+                    if (sub.Event == 1) //publish to sub.Endpoint here 
+                    {
+                        //mqttClient = new MqttClient(mqttBrokerString);
+                        mqttClient = new MqttClient(sub.Endpoint);
+                        mqttClient.Connect(Guid.NewGuid().ToString());
+                        System.Diagnostics.Debug.WriteLine(sub.Endpoint);
+                        if (mqttClient.IsConnected)
+                        {
+                            System.Diagnostics.Debug.WriteLine("WEBSOCKET CONNECTED");
+                            mqttClient.Publish("creation", Encoding.UTF8.GetBytes(resource.Content));
+                            System.Diagnostics.Debug.WriteLine("message published");
+                        }
+                    }
+                } 
+                
                 return CreateData(contName, parcialData);
             }
 
             if (resource.Res_type == "subscription")
             {
-                if (resource.Event == null) return BadRequest("Event can't be empty");
+                if (resource.Event < 1 || resource.Event > 2) 
+                    return BadRequest("Invalid Event value. Acepted values are 1 and 2. 1 is for creation, 2 for deletion");
                 if (resource.Endpoint == null) return BadRequest("Endpoint can't be empty");
                 Subscription partialSubscription = new Subscription()
                 {
