@@ -1,5 +1,6 @@
 ﻿using RestSharp;
 using SOMIOD.Models;
+using SOMIOD.Requests;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

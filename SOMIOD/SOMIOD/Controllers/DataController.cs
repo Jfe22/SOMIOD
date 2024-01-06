@@ -87,8 +87,6 @@ namespace SOMIOD.Controllers
         }
 
 
-
-
         /* ---------- POST HANDLED BY CONTAINERCONTROLLER --------------
         [Route("api/somiod/{appName}/{contName}/data")]
         public IHttpActionResult Post(string contName, [FromBody] Data data)
