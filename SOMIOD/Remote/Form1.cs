@@ -21,6 +21,7 @@ namespace Remote
         public Form1()
         {
             InitializeComponent();
+            restClient = new RestClient(baseURI);
             RestRequest request = new RestRequest("remote", Method.Get);
             RestResponse response = restClient.Execute(request);
 
@@ -44,7 +45,7 @@ namespace Remote
                 Name = "ON",
                 Content = "ON"
             };
-            RestRequest requestCreateData = new RestRequest("lighting/light_bulb", Method.Post);
+            RestRequest requestCreateData = new RestRequest("smarttv/session1", Method.Post);
             requestCreateData.AddObject(requestBody);
             RestResponse responseCreateData = restClient.Execute(requestCreateData);
         }
@@ -57,7 +58,7 @@ namespace Remote
                 Name = "OFF",
                 Content = "OFF"
             };
-            RestRequest requestCreateData = new RestRequest("ligthing/light_bulb", Method.Post);
+            RestRequest requestCreateData = new RestRequest("smarttv/session1", Method.Post);
             requestCreateData.AddObject(requestBody);
             RestResponse responseCreateData = restClient.Execute(requestCreateData);
         }

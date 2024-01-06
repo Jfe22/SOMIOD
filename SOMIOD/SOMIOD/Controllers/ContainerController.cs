@@ -262,13 +262,13 @@ namespace SOMIOD.Controllers
                     Content = resource.Content
                 };
 
+                // WHEN DATA IS CREATED WE SEND A MQTT MESSAGE
                 List<Subscription> subs = new List<Subscription>();
                 subs = DiscoverSubscriptions(contName);
                 foreach (Subscription sub in subs)
                 {
-                    if (sub.Event == 1) //publish to sub.Endpoint here 
+                    if (sub.Event == 1) 
                     {
-                        //mqttClient = new MqttClient(mqttBrokerString);
                         mqttClient = new MqttClient(sub.Endpoint);
                         mqttClient.Connect(Guid.NewGuid().ToString());
                         System.Diagnostics.Debug.WriteLine(sub.Endpoint);
@@ -280,7 +280,7 @@ namespace SOMIOD.Controllers
                         }
                     }
                 } 
-                
+                // -------------------------------------------
                 return CreateData(contName, parcialData);
             }
 

@@ -39,6 +39,8 @@ namespace SmartTV
                 RestRequest requestCreateApp = new RestRequest("", Method.Post);
                 requestCreateApp.AddObject(application);
                 RestResponse responseCreateApp = restClient.Execute(requestCreateApp);
+                System.Diagnostics.Debug.WriteLine(responseCreateApp.Content);
+                MessageBox.Show(responseCreateApp.Content);
                 if (responseCreateApp.StatusCode != System.Net.HttpStatusCode.OK) return;
 
                 //create container resource
@@ -46,27 +48,30 @@ namespace SmartTV
                 {
                     Name = "session1"
                 };
-                RestRequest requestCreateCont = new RestRequest("lighting/containers", Method.Post);
+                RestRequest requestCreateCont = new RestRequest("smarttv", Method.Post);
                 requestCreateCont.AddObject(container);
                 RestResponse responseCreateCont = restClient.Execute(requestCreateCont);
+                System.Diagnostics.Debug.WriteLine(responseCreateCont.Content);
                 if (responseCreateApp.StatusCode != System.Net.HttpStatusCode.OK) return;
 
                 //create subscription resource
-                Subscription subscription = new Subscription
+                RequestCreateDataSubscription subscription = new RequestCreateDataSubscription
                 {
+                    Res_type = "subscription",
                     Name = "sub1",
                     Event = 1,
-                    Endpoint = "mqtt.eclipse.org",
+                    Endpoint = "test.mosquitto.org",
                 };
-                RestRequest requestCreateSub = new RestRequest("lighting/light_bulb/sub", Method.Post);
+                RestRequest requestCreateSub = new RestRequest("smarttv/session1", Method.Post);
                 requestCreateSub.AddObject(subscription);
-                RestResponse responseCreateSub = restClient.Execute(requestCreateCont);
+                RestResponse responseCreateSub = restClient.Execute(requestCreateSub);
+                System.Diagnostics.Debug.WriteLine(responseCreateApp.Content);
             }
             // ----------- set up http ------------------------
 
 
             // ----------- set up mqtt ------------------------
-            mqttClient = new MqttClient("mqtt.eclipse.org");
+            mqttClient = new MqttClient("test.mosquitto.org");
             string[] mStrTopicsInfo = { "create", "destroy" };
             mqttClient.Connect(Guid.NewGuid().ToString());
             if (!mqttClient.IsConnected) MessageBox.Show("Erro ao ligar sockets");

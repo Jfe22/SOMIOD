@@ -5,9 +5,9 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOMIOD", "SOMIOD\SOMIOD.csproj", "{36E7F5F0-2C55-42D5-AB22-3321A947DCD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lighting", "Lighting\Lighting.csproj", "{71795535-F9AB-4303-8CE7-E771AC246F42}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartTV", "SmartTV\SmartTV.csproj", "{EAE540C0-BBA1-478F-82BB-C87EC28B685E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Switch", "Switch\Switch.csproj", "{6A3F2FDF-16EA-44C7-970B-E72ABB37B161}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Remote", "Remote\Remote.csproj", "{0EE9DA9B-75D3-48E4-90EC-E9F5A5415A27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +19,14 @@ Global
 		{36E7F5F0-2C55-42D5-AB22-3321A947DCD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36E7F5F0-2C55-42D5-AB22-3321A947DCD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36E7F5F0-2C55-42D5-AB22-3321A947DCD3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{71795535-F9AB-4303-8CE7-E771AC246F42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{71795535-F9AB-4303-8CE7-E771AC246F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{71795535-F9AB-4303-8CE7-E771AC246F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{71795535-F9AB-4303-8CE7-E771AC246F42}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6A3F2FDF-16EA-44C7-970B-E72ABB37B161}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A3F2FDF-16EA-44C7-970B-E72ABB37B161}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A3F2FDF-16EA-44C7-970B-E72ABB37B161}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6A3F2FDF-16EA-44C7-970B-E72ABB37B161}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAE540C0-BBA1-478F-82BB-C87EC28B685E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAE540C0-BBA1-478F-82BB-C87EC28B685E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAE540C0-BBA1-478F-82BB-C87EC28B685E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAE540C0-BBA1-478F-82BB-C87EC28B685E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EE9DA9B-75D3-48E4-90EC-E9F5A5415A27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EE9DA9B-75D3-48E4-90EC-E9F5A5415A27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EE9DA9B-75D3-48E4-90EC-E9F5A5415A27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EE9DA9B-75D3-48E4-90EC-E9F5A5415A27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
