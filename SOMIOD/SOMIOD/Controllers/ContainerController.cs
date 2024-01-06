@@ -19,8 +19,6 @@ namespace SOMIOD.Controllers
         MqttClient mqttClient = null;
         string[] mStrTopicsInfo = {"creation", "deletion"};
 
-        //mqttClient = new MqttClient(mqttBrokerString); 
-
         public int FetchParentId(string resName, string resType)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
@@ -254,7 +252,6 @@ namespace SOMIOD.Controllers
         {
             if (resource.Res_type == "data")
             {
-
                 if (resource.Content == null) return BadRequest("Content can't be empty");
                 Data parcialData = new Data()
                 {
@@ -281,6 +278,7 @@ namespace SOMIOD.Controllers
                     }
                 } 
                 // -------------------------------------------
+
                 return CreateData(contName, parcialData);
             }
 

@@ -66,6 +66,7 @@ namespace SmartTV
                 requestCreateSub.AddObject(subscription);
                 RestResponse responseCreateSub = restClient.Execute(requestCreateSub);
                 System.Diagnostics.Debug.WriteLine(responseCreateApp.Content);
+
             }
             // ----------- set up http ------------------------
 
@@ -81,6 +82,17 @@ namespace SmartTV
 
             mqttClient.Subscribe(mStrTopicsInfo, qosLevels);
             // ----------- set up mqtt ------------------------
+
+
+            // ---------- load first data ------------------------
+            RestRequest requestData = new RestRequest("smarttv/session1", Method.Get);
+            requestData.RequestFormat = DataFormat.Xml;
+            requestData.AddHeader("somiod-discover", "data");
+            List<Data> responseData = restClient.Execute<List<Data>>(requestData).Data;
+            if (responseData == null || responseData.Count == 0) textBoxValue.Text = "No data yet";
+            else textBoxValue.Text = responseData[responseData.Count - 1].Content;
+            // ---------- load first data ------------------------
+    
         }
 
         private void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)

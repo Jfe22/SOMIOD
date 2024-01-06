@@ -115,7 +115,7 @@ namespace SOMIOD.Controllers
             return Ok(containers);
         }
 
-        public IHttpActionResult CreateContainer(string appName, [FromBody]Container container)
+        public IHttpActionResult CreateContainer(string appName, Container container)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             int parentID = FetchParentId(appName);
@@ -247,7 +247,6 @@ namespace SOMIOD.Controllers
         [Route("api/somiod/{appName}")]
         public IHttpActionResult PostContainer(string appName, [FromBody]Container container)
         {
-            System.Diagnostics.Debug.WriteLine(container.Name);
             return CreateContainer(appName, container);
         }
 

@@ -86,12 +86,14 @@ namespace SOMIOD.Controllers
             }
         }
 
+
         /* ---------- POST HANDLED BY CONTAINERCONTROLLER --------------
         [Route("api/somiod/{appName}/{contName}/sub")]
         public IHttpActionResult Post(string contName, [FromBody]Subscription subscription)
         {
         }
         ---------- POST HANDLED BY CONTAINERCONTROLLER -------------- */ 
+
 
         [Route("api/somiod/{appName}/{contName}/sub/{subName}")]
         public IHttpActionResult Put(string contName, string subName, [FromBody]Subscription subscription)
