@@ -16,8 +16,6 @@ namespace SOMIOD.Controllers
 
         //---------------- AUX -----------------
         string connectionString = SOMIOD.Properties.Settings.Default.ConnStr;
-        string mqttBrokerString = "127.0.0.1";
-
         MqttClient mqttClient = null;
         string[] mStrTopicsInfo = {"creation", "deletion"};
 
@@ -88,10 +86,9 @@ namespace SOMIOD.Controllers
             {
                 if (!sqlDataReader.IsClosed) sqlDataReader.Close();
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
-                //return BadRequest(ex.Message);
+                System.Diagnostics.Debug.WriteLine(ex.Message);
             }
 
-            //return Ok(dataList);
             return dataList;
         }
 
@@ -128,10 +125,9 @@ namespace SOMIOD.Controllers
             {
                 if (!sqlDataReader.IsClosed) sqlDataReader.Close();
                 if (sqlConnection.State == System.Data.ConnectionState.Open) sqlConnection.Close();
-                //return BadRequest(ex.Message);
+                System.Diagnostics.Debug.WriteLine(ex.Message);
             }
 
-            //return Ok(subscriptions);
             return subscriptions;
         }
 
@@ -154,11 +150,6 @@ namespace SOMIOD.Controllers
                     cmd.Parameters.AddWithValue("parent", parentID);
                     int nrows = cmd.ExecuteNonQuery();
                     sqlConnection.Close();
-
-                    //publish mensage here??
-                    //MttqClient teste = new MttqClient("IPAddress.Parse("...
-                    //----------------------
-                    //getSub(parentID, )
 
                     if (nrows <= 0) return BadRequest("Could not create data resource");
                     return Ok(nrows);
@@ -271,10 +262,7 @@ namespace SOMIOD.Controllers
                     Content = resource.Content
                 };
 
-                //check who subed this container
-                //send content(data) to broker, endpoint
                 List<Subscription> subs = new List<Subscription>();
-                //subs = (List<Subscription>)DiscoverSubscriptions(contName);
                 subs = DiscoverSubscriptions(contName);
                 foreach (Subscription sub in subs)
                 {
